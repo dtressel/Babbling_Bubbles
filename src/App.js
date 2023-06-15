@@ -1,23 +1,30 @@
-import logo from './logo.svg';
+import { useState } from 'react';
 import './App.css';
 
+const wordDictionary = require('an-array-of-english-words');
+
+
 function App() {
+  const [wordInput, setWordInput] = useState('');
+  const [result, setResult] = useState('');
+
+  const handleChange = (evt) => {
+    setWordInput(evt.target.value);
+  }
+  
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
+    setResult(wordDictionary.includes(wordInput) ? "Yes" : "Nope");
+    setWordInput('');
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <form onSubmit={handleSubmit}>
+        <input type='text' onChange={handleChange} value={wordInput} />
+        <button type='submit'>check</button>
+      </form>
+      <div>{result}</div>
     </div>
   );
 }
