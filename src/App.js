@@ -1,31 +1,54 @@
-import { useState } from 'react';
 import './App.css';
+import { createBrowserRouter ,RouterProvider } from 'react-router-dom';
 
-const wordDictionary = require('an-array-of-english-words');
-
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <AppLayout />,
+    loader: null,
+    children: [
+      {
+        path: "home",
+        element: <Home />,
+        loader: null,
+      },
+      {
+        path: "how-to-play",
+        element: <HowToPlay />,
+        loader: null,
+      },
+      {
+        path: "play",
+        element: <Play />,
+        loader: null,
+      },
+      {
+        path: "login",
+        element: <Login />,
+        loader: null,
+      },
+      {
+        path: "register",
+        element: <Register />,
+        loader: null,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+        loader: null,
+      },
+      {
+        path: "leaderboard",
+        element: <Leaderboard />,
+        loader: null,
+      },
+    ],
+  },
+]);
 
 function App() {
-  const [wordInput, setWordInput] = useState('');
-  const [result, setResult] = useState('');
-
-  const handleChange = (evt) => {
-    setWordInput(evt.target.value);
-  }
-  
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    setResult(wordDictionary.includes(wordInput) ? "Yes" : "Nope");
-    setWordInput('');
-  }
-
   return (
-    <div className="App">
-      <form onSubmit={handleSubmit}>
-        <input type='text' onChange={handleChange} value={wordInput} />
-        <button type='submit'>check</button>
-      </form>
-      <div>{result}</div>
-    </div>
+    <RouterProvider router={router} />
   );
 }
 
