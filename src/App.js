@@ -1,5 +1,13 @@
 import './App.css';
 import { createBrowserRouter ,RouterProvider } from 'react-router-dom';
+import AppLayout from './layouts/AppLayout';
+import Home from './pages/Home';
+import HowToPlay from './pages/HowToPlay';
+import Play from './page/Play';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
+import Leaderboard from './pages/Leaderboard';
 
 const router = createBrowserRouter([
   {
@@ -8,7 +16,6 @@ const router = createBrowserRouter([
     loader: null,
     children: [
       {
-        path: "home",
         element: <Home />,
         loader: null,
       },
