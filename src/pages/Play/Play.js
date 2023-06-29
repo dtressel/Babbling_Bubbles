@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './Play.css';
 
 const wordDictionary = require('an-array-of-english-words');
 

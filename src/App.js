@@ -3,19 +3,22 @@ import { createBrowserRouter ,RouterProvider } from 'react-router-dom';
 import AppLayout from './layouts/AppLayout';
 import Home from './pages/Home';
 import HowToPlay from './pages/HowToPlay';
-import Play from './page/Play';
+import Play from './pages/Play';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
-import Leaderboard from './pages/Leaderboard';
+import Leaderboards from './pages/Leaderboards';
+import Strategies from './pages/Strategies';
+import About from './pages/About';
+import Stats from './pages/Stats';
 
 const router = createBrowserRouter([
   {
-    path: "/",
     element: <AppLayout />,
     loader: null,
     children: [
       {
+        path: "/",
         element: <Home />,
         loader: null,
       },
@@ -45,8 +48,23 @@ const router = createBrowserRouter([
         loader: null,
       },
       {
-        path: "leaderboard",
-        element: <Leaderboard />,
+        path: "leaderboards",
+        element: <Leaderboards />,
+        loader: null,
+      },
+      {
+        path: "strategies",
+        element: <Strategies />,
+        loader: null,
+      },
+      {
+        path: "about",
+        element: <About />,
+        loader: null,
+      },
+      {
+        path: "stats",
+        element: <Stats />,
         loader: null,
       },
     ],
