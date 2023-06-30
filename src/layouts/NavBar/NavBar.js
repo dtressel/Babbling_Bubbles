@@ -48,7 +48,7 @@ function NavBar() {
 
   return (
     // Div to contain whole app bar
-    <Box sx={{display: "flex", justifyContent: "center"}}>
+    <Box sx={{display: "flex", justifyContent: "center" }}>
       <AppBar
         position="static"
         sx={{ backgroundColor: "rgb(61, 133, 198)", borderRadius: "0.15rem", width: "calc(100% - 8px)" }}

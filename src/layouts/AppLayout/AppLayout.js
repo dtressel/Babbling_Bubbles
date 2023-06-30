@@ -1,6 +1,8 @@
-import NavBar from "../NavBar/NavBar";
+import NavBar from "../NavBar";
+import Footer from "../Footer";
 import { Outlet } from "react-router-dom";
 import Container from "@mui/material/Container";
+import './AppLayout.css';
 
 const AppLayout = () => {
   return (
@@ -9,6 +11,7 @@ const AppLayout = () => {
       <Container component="main" maxWidth="xl">
         <Outlet />
       </Container>
+      <Footer />
     </>
   )
 }

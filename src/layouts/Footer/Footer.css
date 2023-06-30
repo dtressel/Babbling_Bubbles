@@ -1,0 +1,23 @@
+.Footer > div {
+  display: flex;
+  justify-content: center;
+  margin: 0.3rem 0;
+}
+
+.Footer-links > a {
+  margin: 0 1rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.Footer-links > a:hover {
+  color: rgb(31, 31, 31);
+}
+
+.Footer-copyright > div, .Footer-links > a {
+  color: rgb(116, 116, 116);
+}
+
+.Footer-copyright > div {
+  font-size: 0.8rem;
+}
