@@ -21,8 +21,14 @@ class GameBoardState {
     // each inner array is an array of coordinates for each step in the path
     const locations = [];
     function testColumnsOfNeighbors(testColumn, currRow, i, j, gameInstance) {
+      // Omit testing the row below the bottom-most row
+      let testUntilRow = 1;
+      // if currRow is the bottom-most row
+      if (currRow === gameInstance.rows - 1) {
+        testUntilRow = 0;
+      }
       // for each of the neighboring letters in the test column
-      for (let k = -1; k <= 1; k++) {
+      for (let k = -1; k <= testUntilRow; k++) {
         // if you the letter we're looking for is found at this test location
         if (gameInstance.currentBoard[testColumn][currRow + k] === str[i]) {
           // if this location has not already been used in this path
@@ -41,6 +47,7 @@ class GameBoardState {
         }
       }
     }
+
     // find occurances of first letter
     for (let i = 0; i < this.columns; i++) {
       for (let j = 0; j < this.rows; j++) {
