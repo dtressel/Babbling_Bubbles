@@ -127,7 +127,6 @@ class GameBoardState {
       }
     }
     return locations;
-    // alter so it does view next rows as part of grid
   }
 
   static chooseLetters(numOfLetters) {
