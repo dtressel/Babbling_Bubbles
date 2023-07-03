@@ -2,6 +2,10 @@
 
 A word game like Boggle except letters are used up and replaced with new letters like Scrabble.
 
+## Outside Data:
+
+The only 3rd party used for this game is the dictionary data to check words against. I will be using the list of words provided by this npm package: https://www.npmjs.com/package/an-array-of-english-words
+
 ## Overview of gameplay:
 
 - Single-player game (for now).  
