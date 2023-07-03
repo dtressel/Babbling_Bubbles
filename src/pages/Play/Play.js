@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import GameBoardState from '../../helpers/GameBoardState';
 import Button from '@mui/material/Button';
 import './Play.css';
 
 const wordDictionary = require('an-array-of-english-words');
-
+const COLUMNS = 5;
+const ROWS = 4;
+const VISIBLE_NEXT_ROWS = 2;
 
 function Play() {
   const [notStarted, setNotStarted] = useState(true);
@@ -13,9 +16,17 @@ function Play() {
   const [timer, setTimer] = useState(180);
   const [wordInput, setWordInput] = useState('');
   const [result, setResult] = useState('');
+  const [locations, setLocations] = useState([]);
+  const [primaryLocationIdx, setPrimaryLocationIdx] = useState(0);
 
   const intervalId = useRef();
+  const gameInstance = useRef();
   let timeDisplay;
+  const primaryLocation = new Set(locations[primaryLocationIdx]);
+  const secondaryLocations = new Set([
+    ...locations.slice(0, primaryLocationIdx),
+    ...locations.slice(primaryLocationIdx + 1)
+  ].flat());
 
   if (timer === 0) {
     setGameFinished(true);
@@ -39,19 +50,28 @@ function Play() {
       setGameInProgress(true);
       intervalId.current = setInterval(() => {
         setTimer((timer) => timer - 1);
-        console.log('tick');
       }, 1000);
     }, 3000);
+    gameInstance.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
   }
 
   const handleChange = (evt) => {
-    setWordInput(evt.target.value);
+    let str = evt.target.value;
+    if (str[str.length - 1] === ' ') {
+      str = str.slice(0, -1);
+      setPrimaryLocationIdx((primaryLocationIdx) => (
+        (primaryLocationIdx >= locations.length - 1) ? 0 : primaryLocationIdx + 1
+      ));
+    }
+    setWordInput(str);
+    setLocations(gameInstance.current.findLocations(str));
   }
   
   const handleSubmit = (evt) => {
     evt.preventDefault();
     setResult(wordDictionary.includes(wordInput) ? "Yes" : "Nope");
     setWordInput('');
+    setLocations([]);
   }
 
   if (notStarted) {
@@ -83,6 +103,30 @@ function Play() {
       <div className="Play">
         <p>Game in progress</p>
         <p>Timer: {timeDisplay}</p>
+        <div className="Play-game-board">
+          {gameInstance.current.currentBoard.map((column, columnIdx) => {
+            return (
+              <div key={columnIdx}>
+                {column.slice(0, ROWS).map((letter, rowIdx) => {
+                  return (
+                    <div 
+                      className=
+                        {`
+                          Play-letter-bubble 
+                          ${primaryLocation.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
+                            secondaryLocations.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
+                        `}
+                      key={`${columnIdx}${rowIdx}`}
+                    >
+                      {letter}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })
+          }
+        </div>
         <form onSubmit={handleSubmit}>
           <input type='text' onChange={handleChange} value={wordInput} />
           <button type='submit'>check</button>

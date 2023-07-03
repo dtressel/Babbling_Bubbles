@@ -1,8 +1,9 @@
 class GameBoardState {
-  constructor(columns, rows, nextRows) {
+  constructor(columns, rows, visibleNextRows) {
     this.columns = columns;
     this.rows = rows;
-    this.nextRows = nextRows;
+    this.visibleNextRows = visibleNextRows;
+    this.hiddenNextRows = rows;
     this.currentBoard = this.createNewBoard();
   }
   
@@ -10,7 +11,7 @@ class GameBoardState {
   createNewBoard() {
     const gameBoard = [];
     for (let i = 0; i < this.columns; i++) {
-      gameBoard.push(GameBoardState.chooseLetters(this.rows + this.nextRows));
+      gameBoard.push(GameBoardState.chooseLetters(this.rows + this.visibleNextRows + this.hiddenNextRows));
     }
     return gameBoard;
   }
@@ -151,3 +152,5 @@ class GameBoardState {
   ];
 
 }
+
+export default GameBoardState;
