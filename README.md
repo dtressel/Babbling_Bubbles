@@ -1,3 +1,39 @@
+# Babbling Bubbles
+
+A word game like Boggle except letters are used up and replaced with new letters like Scrabble.
+
+## Overview of gameplay:
+
+- Single-player game (for now).  
+- The player starts with a vertical Boggle-like grid of letter tiles.
+- The letter tiles are shaped as bubbles and are placed in a water background.  
+- Similar to Boggle, when you find a word, you get points based on the length of the word found.
+- However, after entering the word, the letter bubbles used for the word pop and disappear and letter bubbles from below “bubble up” to fill the empty space. Any empty space at the bottom of the grid will be filled by new bubbles that appear from below. You now will need to find words in this slightly changed grid.
+- The changes to the grid with each word found adds new interesting strategies to the normal Boggle game. For example, players will have to be careful not to only use the very common letters because as those are used up and replaced with random letters, the grid can get crowded with only uncommon letters and words will be difficult to form.
+- You have 3 minutes to find words and build your score.
+## Overview of website:
+- Tech stack: React, Node/Express
+- This will be a front-end focused application. Front-end goals will be to create fun and smooth gameplay with animations and with a simple user interface and playful and attractive styling.
+- This will be a website with thoughts of maintaining gameplay that could eventually be turned into a mobile app.
+- The goal of this game will be to create a fun casual word game that players can use to relax and compete against themselves for high scores.
+- Target demographic: young adults
+- I will use this npm package to verify words that users enter: https://www.npmjs.com/package/an-array-of-english-words
+- I will create an algorithm to choose letters so that common letters will appear more frequently than uncommon letters.
+## MVP version of app:
+- Users will land on a fun but simple homepage with how-to-play, login, and play links.
+- The play link will send users to a new page styled with a water background and a central start game button. A 3 second countdown timer will commence after the start game button is pressed. After the 3 seconds, the game board will appear and an input field to enter words will become active. A 3-minute timer will begin and the game will end when the 3 minute timer expires.
+- When a player enters words, the words will be checked against the dictionary immediately on the front-end. Correct words will pop the bubbles and increase the players score. Incorrect words will display a “not a word” message and will clear the input field.
+- After the game, a total score will be displayed and an option to play again.
+- Users can play without logging in, but will have the option to log in to store their stats and high scores.
+- The database will store user and statistical information and the backend will communicate with the database.
+- The complexity of the application in the MVP version (that make it more than just a simple CRUD app), will be centered around the front-end gameplay, animations, and styling.
+## Additional (stretch) Features:
+- Special 2x and 3x bubbles will randomly appear that, when used for a word, will multiply the score for that word by 2 or 3 times. Incorporating multiple special bubbles in a word would result in a compounded bonus. For example, using one 2x and one 3x bubble in a single word would result in the score for that word being multiplied by 6.
+- Like Scrabble, uncommon letter can count for more points than common letters when used.
+- Special fixed games that contain fixed letter choices (I’ll call them “fixed puzzles”) can be added that contain their own high score board. Users at the home page would be able to choose to play random games or fixed games. Fixed games will be predefined games that would result in the same letters appearing each time. I could create something like 100 fixed puzzles. I would create parameters to plug into the letter choosing algorithm to create the fixed letter choices for each fixed puzzle. With fixed puzzles players can compete against each other to try to achieve a high score for that puzzle. This would also create new tables in the database for these fixed puzzles.
+- Instead of fixed puzzles or in addition to regular fixed puzzles there could be daily fixed puzzles similar to how wordle has daily puzzles. The fixed puzzles will only be available on the single day and users can compete to get the highest score for that daily fixed puzzle.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
