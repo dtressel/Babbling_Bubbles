@@ -17,7 +17,7 @@ class GameBoardState {
   }
 
   // find all locations of instances of a string
-  findLocations(str) {
+  findLocations(str, primaryLocationIdx) {
     // creates an array of arrays
     // each inner array is an array of coordinates for each step in the path
     const locations = [];
@@ -38,7 +38,10 @@ class GameBoardState {
             if (locations[j].length > i) {
               const newPath = locations[j].slice(0, -1);
               newPath.push(`${testColumn}${currRow + k}`);
-              locations.push(newPath);
+              locations.splice(j + 1, 0, newPath);
+              if (i === str.length - 1 && j < primaryLocationIdx) {
+                primaryLocationIdx++;
+              }
             } 
             // else if this is the only matching neighbor so far
             else {
@@ -60,30 +63,33 @@ class GameBoardState {
     // build location paths for rest of string
     // for each letter of string after first letter
     for (let i = 1; i < str.length; i++) {
-      // fix length value of locations because we may add to locations,
-      // and we don't want to loop through the additions; else infite loop
-      let locationsLength = locations.length;
+      // Will loop through locations using 'distanceFromEnd' variable since we'll be adding
+      // new locations after current testing location and before next testing location
+      // and will need to skip the added locations or else we'll get an infinite loop.
+      // 'j' will still be an incrementing variable starting at 0 but will skip indices 
+      // based on the potentially increasing length of locations.
+      // This looping method will also cause us to avoid skipping locations when deleting one.
+      let distanceFromEnd = locations.length;
       // for each path in locations array
-      for (let j = 0; j < locationsLength; j++) {
+      for (let j = 0; distanceFromEnd > 0; j = locations.length - distanceFromEnd) {
+        console.log(primaryLocationIdx);
         const currColumn = +locations[j][i - 1][0];
         const currRow = +locations[j][i - 1][1];
-        // if the left adjacent column is in bounds, test
-        if (currColumn - 1 >= 0) {
-          testColumnsOfNeighbors(currColumn - 1, currRow, i, j, this);
-        }
-        // test currColumn
-        testColumnsOfNeighbors(currColumn, currRow, i, j, this);
         // if column to the right is in bounds, test
         if (currColumn + 1 < this.columns) {
           testColumnsOfNeighbors(currColumn + 1, currRow, i, j, this);
         }
+        // test currColumn
+        testColumnsOfNeighbors(currColumn, currRow, i, j, this);
+        // if the left adjacent column is in bounds, test
+        if (currColumn - 1 >= 0) {
+          testColumnsOfNeighbors(currColumn - 1, currRow, i, j, this);
+        }
         // if no neighbors matched, delete this path
         if (locations[j].length === i) {
           locations.splice(j, 1);
-          // decrement j and locationsLength because locations array will now be one shorter
-          j--;
-          locationsLength--;
         }
+        distanceFromEnd--;
       }
     }
     // check for duplicate paths
@@ -123,11 +129,15 @@ class GameBoardState {
           // remove all indices from locations
           for (let i = 0; i < indicesToDelete.length; i++) {
             locations.splice(indicesToDelete[i], 1);
+            // if indexToDelete is below are the same as the primaryPositionIdx, decrement
+            if (indicesToDelete[i] <= primaryLocationIdx) {
+              primaryLocationIdx--;
+            }
           }
         }
       }
     }
-    return locations;
+    return {locations, primaryLocationIdx};
   }
 
   static chooseLetters(numOfLetters) {

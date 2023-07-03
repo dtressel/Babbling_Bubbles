@@ -63,8 +63,12 @@ function Play() {
         (primaryLocationIdx >= locations.length - 1) ? 0 : primaryLocationIdx + 1
       ));
     }
-    setWordInput(str);
-    setLocations(gameInstance.current.findLocations(str));
+    else {
+      setWordInput(str);
+      const locationObj = gameInstance.current.findLocations(str, primaryLocationIdx)
+      setLocations(locationObj.locations);
+      setPrimaryLocationIdx(locationObj.primaryLocationIdx);
+    }
   }
   
   const handleSubmit = (evt) => {
@@ -72,6 +76,7 @@ function Play() {
     setResult(wordDictionary.includes(wordInput) ? "Yes" : "Nope");
     setWordInput('');
     setLocations([]);
+    setPrimaryLocationIdx(0);
   }
 
   if (notStarted) {
