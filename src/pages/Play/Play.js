@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import GameBoardState from '../../helpers/GameBoardState';
 import Button from '@mui/material/Button';
 import './Play.css';
