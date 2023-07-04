@@ -8,6 +8,8 @@ const COLUMNS = 5;
 const ROWS = 4;
 const VISIBLE_NEXT_ROWS = 2;
 
+// new-locations branch
+
 function Play() {
   const [notStarted, setNotStarted] = useState(true);
   const [gameInProgress, setGameInProgress] = useState(false);
