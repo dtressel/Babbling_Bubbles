@@ -5,6 +5,7 @@ class GameBoardState {
     this.visibleNextRows = visibleNextRows;
     this.hiddenNextRows = rows;
     this.currentBoard = this.createNewBoard();
+    this.savedPaths = [];
   }
   
   // creates an array of arrays, each inner array represents a column on the game board
@@ -16,11 +17,11 @@ class GameBoardState {
     return gameBoard;
   }
 
-  // find all locations of instances of a string
-  findLocations(str, primaryLocationIdx) {
+  // find all paths of instances of a string
+  findPaths(str, primaryPathIdx) {
     // creates an array of arrays
     // each inner array is an array of coordinates for each step in the path
-    const locations = [];
+    const paths = [];
     function testColumnsOfNeighbors(testColumn, currRow, i, j, gameInstance) {
       // Omit testing the row below the bottom-most row
       let testUntilRow = 1;
@@ -30,22 +31,22 @@ class GameBoardState {
       }
       // for each of the neighboring letters in the test column
       for (let k = -1; k <= testUntilRow; k++) {
-        // if you the letter we're looking for is found at this test location
+        // if you the letter we're looking for is found at this test path
         if (gameInstance.currentBoard[testColumn][currRow + k] === str[i]) {
-          // if this location has not already been used in this path
-          if (!locations[j].includes(`${testColumn}${currRow + k}`)) {
+          // if this path has not already been used in this path
+          if (!paths[j].includes(`${testColumn}${currRow + k}`)) {
             // if this is not the only matching neighbor
-            if (locations[j].length > i) {
-              const newPath = locations[j].slice(0, -1);
+            if (paths[j].length > i) {
+              const newPath = paths[j].slice(0, -1);
               newPath.push(`${testColumn}${currRow + k}`);
-              locations.splice(j + 1, 0, newPath);
-              if (i === str.length - 1 && j < primaryLocationIdx) {
-                primaryLocationIdx++;
+              paths.splice(j + 1, 0, newPath);
+              if (i === str.length - 1 && j < primaryPathIdx) {
+                primaryPathIdx++;
               }
             } 
             // else if this is the only matching neighbor so far
             else {
-              locations[j].push(`${testColumn}${currRow + k}`);
+              paths[j].push(`${testColumn}${currRow + k}`);
             }
           }
         }
@@ -56,25 +57,25 @@ class GameBoardState {
     for (let i = 0; i < this.columns; i++) {
       for (let j = 0; j < this.rows; j++) {
         if (str[0] === this.currentBoard[i][j]) {
-          locations.push([`${i}${j}`]);
+          paths.push([`${i}${j}`]);
         }
       }
     }
-    // build location paths for rest of string
+    // build paths for rest of string
     // for each letter of string after first letter
     for (let i = 1; i < str.length; i++) {
-      // Will loop through locations using 'distanceFromEnd' variable since we'll be adding
-      // new locations after current testing location and before next testing location
-      // and will need to skip the added locations or else we'll get an infinite loop.
+      // Will loop through paths using 'distanceFromEnd' variable since we'll be adding
+      // new paths after current testing path and before next testing path
+      // and will need to skip the added paths or else we'll get an infinite loop.
       // 'j' will still be an incrementing variable starting at 0 but will skip indices 
-      // based on the potentially increasing length of locations.
-      // This looping method will also cause us to avoid skipping locations when deleting one.
-      let distanceFromEnd = locations.length;
-      // for each path in locations array
-      for (let j = 0; distanceFromEnd > 0; j = locations.length - distanceFromEnd) {
-        console.log(primaryLocationIdx);
-        const currColumn = +locations[j][i - 1][0];
-        const currRow = +locations[j][i - 1][1];
+      // based on the potentially increasing length of paths.
+      // This looping method will also cause us to avoid skipping paths when deleting one.
+      let distanceFromEnd = paths.length;
+      // for each path in paths array
+      for (let j = 0; distanceFromEnd > 0; j = paths.length - distanceFromEnd) {
+        console.log(primaryPathIdx);
+        const currColumn = +paths[j][i - 1][0];
+        const currRow = +paths[j][i - 1][1];
         // if column to the right is in bounds, test
         if (currColumn + 1 < this.columns) {
           testColumnsOfNeighbors(currColumn + 1, currRow, i, j, this);
@@ -86,18 +87,18 @@ class GameBoardState {
           testColumnsOfNeighbors(currColumn - 1, currRow, i, j, this);
         }
         // if no neighbors matched, delete this path
-        if (locations[j].length === i) {
-          locations.splice(j, 1);
+        if (paths[j].length === i) {
+          paths.splice(j, 1);
         }
         distanceFromEnd--;
       }
     }
     // check for duplicate paths
-    if (str.length > 1 && locations.length > 1) {
+    if (str.length > 1 && paths.length > 1) {
       // sum the coordinates (as a number) of each path and add to Array
       const sumsArr = [];
-      for (let i = 0; i < locations.length; i++) {
-        sumsArr.push(locations[i].reduce((sum, curr) => +sum + +curr));
+      for (let i = 0; i < paths.length; i++) {
+        sumsArr.push(paths[i].reduce((sum, curr) => +sum + +curr));
       }
       // check for duplicate sums
       const duplicates = [];
@@ -113,9 +114,9 @@ class GameBoardState {
         let indicesToDelete = [];
         for (let i = 0; i < duplicates.length; i++) {
           // join paths with same sums into a set
-          const testSet = new Set([...locations[duplicates[i][0]], ...locations[duplicates[i][1]]]);
-          // if size of the set is the same as the size of a location path, remove location path
-          if (testSet.size === locations[0].length) {
+          const testSet = new Set([...paths[duplicates[i][0]], ...paths[duplicates[i][1]]]);
+          // if size of the set is the same as the size of a path, remove path
+          if (testSet.size === paths[0].length) {
             // push indices to delete into an array
             indicesToDelete.push(duplicates[i][1]);
           }
@@ -126,18 +127,18 @@ class GameBoardState {
           indicesToDelete = [...new Set(indicesToDelete)];
           // sort them from largest to smallest
           indicesToDelete.sort((a, b) => (b - a));
-          // remove all indices from locations
+          // remove all indices from paths
           for (let i = 0; i < indicesToDelete.length; i++) {
-            locations.splice(indicesToDelete[i], 1);
-            // if indexToDelete is below are the same as the primaryPositionIdx, decrement
-            if (indicesToDelete[i] <= primaryLocationIdx) {
-              primaryLocationIdx--;
+            paths.splice(indicesToDelete[i], 1);
+            // if indexToDelete is below are the same as the primaryPathIdx, decrement
+            if (indicesToDelete[i] <= primaryPathIdx) {
+              primaryPathIdx--;
             }
           }
         }
       }
     }
-    return {locations, primaryLocationIdx};
+    return {paths, primaryPathIdx};
   }
 
   static chooseLetters(numOfLetters) {

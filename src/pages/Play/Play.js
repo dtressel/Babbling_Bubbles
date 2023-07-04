@@ -18,16 +18,16 @@ function Play() {
   const [timer, setTimer] = useState(180);
   const [wordInput, setWordInput] = useState('');
   const [result, setResult] = useState('');
-  const [locations, setLocations] = useState([]);
-  const [primaryLocationIdx, setPrimaryLocationIdx] = useState(0);
+  const [paths, setPaths] = useState([]);
+  const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
 
   const intervalId = useRef();
   const gameInstance = useRef();
   let timeDisplay;
-  const primaryLocation = new Set(locations[primaryLocationIdx]);
-  const secondaryLocations = new Set([
-    ...locations.slice(0, primaryLocationIdx),
-    ...locations.slice(primaryLocationIdx + 1)
+  const primaryLocation = new Set(paths[primaryPathIdx]);
+  const secondaryPaths = new Set([
+    ...paths.slice(0, primaryPathIdx),
+    ...paths.slice(primaryPathIdx + 1)
   ].flat());
 
   if (timer === 0) {
@@ -61,15 +61,15 @@ function Play() {
     let str = evt.target.value;
     if (str[str.length - 1] === ' ') {
       str = str.slice(0, -1);
-      setPrimaryLocationIdx((primaryLocationIdx) => (
-        (primaryLocationIdx >= locations.length - 1) ? 0 : primaryLocationIdx + 1
+      setPrimaryPathIdx((primaryPathIdx) => (
+        (primaryPathIdx >= paths.length - 1) ? 0 : primaryPathIdx + 1
       ));
     }
     else {
       setWordInput(str);
-      const locationObj = gameInstance.current.findLocations(str, primaryLocationIdx)
-      setLocations(locationObj.locations);
-      setPrimaryLocationIdx(locationObj.primaryLocationIdx);
+      const locationObj = gameInstance.current.findPaths(str, primaryPathIdx)
+      setPaths(locationObj.paths);
+      setPrimaryPathIdx(locationObj.primaryPathIdx);
     }
   }
   
@@ -77,8 +77,8 @@ function Play() {
     evt.preventDefault();
     setResult(wordDictionary.includes(wordInput) ? "Yes" : "Nope");
     setWordInput('');
-    setLocations([]);
-    setPrimaryLocationIdx(0);
+    setPaths([]);
+    setPrimaryPathIdx(0);
   }
 
   if (notStarted) {
@@ -121,7 +121,7 @@ function Play() {
                         {`
                           Play-letter-bubble 
                           ${primaryLocation.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
-                            secondaryLocations.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
+                            secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
                         `}
                       key={`${columnIdx}${rowIdx}`}
                     >
