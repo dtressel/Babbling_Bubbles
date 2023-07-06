@@ -1,3 +1,5 @@
+import { LocalConvenienceStoreOutlined } from "@mui/icons-material";
+
 class GameBoardState {
   constructor(columns, rows, visibleNextRows) {
     this.columns = columns;
@@ -48,6 +50,17 @@ class GameBoardState {
     return gameBoard;
   }
 
+  setPrimaryPathIdx(idx) {
+    const savedPathsLength = this.savedPaths.length;
+    const lastSavedPaths = this.savedPaths[savedPathsLength - 1];
+    if (!savedPathsLength) return;
+    // clear old primaryPathIdx info
+    for (let i = 0; i < lastSavedPaths.length; i++) {
+      lastSavedPaths.paths[i].primary = false;
+    }
+    lastSavedPaths.paths[idx].primary = true;
+  }
+
   /* 
     Find all paths of instances of the new input
 
@@ -65,43 +78,49 @@ class GameBoardState {
     Only one path should be set as primary: true
   */
   findPaths(newInput) {
-    // if input field is empty return an empty array and reset this.savedPaths
-    if (!newInput) {
-      this.savedPaths = [];
-      return [];
-    }
+    let newPaths;
 
-    const lastSavedPathsObj = this.savedPaths[this.savedPaths.length - 1];
-    const savedInput = lastSavedPathsObj.input;
-    const savedInputLength = savedInput.length;
+    let lastSavedPathsObj;
+    let savedInput = '';
+    let savedInputLength = 0;
     const newInputLength = newInput.length;
 
-    // if input field is unchanged yet somehow this function was called, return formerly saved paths
-    if (newInput === savedInput) {
-      return lastSavedPathsObj.paths;
+    if (this.savedPaths.length) {
+      lastSavedPathsObj = this.savedPaths[this.savedPaths.length - 1];
+      savedInput = lastSavedPathsObj.input;
+      savedInputLength = savedInput.length;
     }
 
+    // if input field is empty set newPaths as an empty array and reset this.savedPaths
+    if (!newInput) {
+      this.savedPaths = [];
+      newPaths = [];
+    }
+    // if input field is unchanged yet somehow this function was called, set newPaths as formerly saved paths
+    else if (newInput === savedInput) {
+      newPaths = lastSavedPathsObj.paths;
+    }
     // if the newInput passed is not one less or one more character than the last input value
     // then use alternative method 'findFullPaths' to find paths.
     // This is necessary in case of an error, a user copy and pastes, or a user has 
     // a way to input multiple characters at once
-    if (this.input !== newInput.slice(0, -1) && this.input(0, -1) !== newInput) {
+    else if (savedInput !== newInput.slice(0, -1) && savedInput.slice(0, -1) !== newInput) {
       this.savedPaths = [];
-      return this.findFullPaths(newInput);
+      newPaths = this.findFullPaths(newInput);
     }
-
     // if new input is one character, find occurances of first letter
-    if (newInputLength === 1) {
+    else if (newInputLength === 1) {
       this.savedPaths = [];
       const paths = [];
       for (let i = 0; i < this.columns; i++) {
         for (let j = 0; j < this.rows; j++) {
-          if (newInput[0] === this.currentBoard[i][j]) {
+          if (newInput === this.currentBoard[i][j]) {
+            
             if (!paths.length) {
-              paths.push({path: [`${i}${j}`], primary: true});
+              paths.push({ path: [`${i}${j}`], primary: true });
             }
             else {
-              paths.push({path: [`${i}${j}`], primary: false});
+              paths.push({ path: [`${i}${j}`], primary: false });
             }
           }
         }
@@ -112,17 +131,15 @@ class GameBoardState {
           paths: paths
         }
       );
-      return paths;
+      newPaths = paths;
     }
-
     // if a character was deleted from the input field
-    if (newInputLength === savedInputLength - 1) {
+    else if (newInputLength === savedInputLength - 1) {
       this.savedPaths.pop();
-      return this.savedPaths[this.savedPaths.legnth - 1].paths;
+      newPaths = this.savedPaths[this.savedPaths.legnth - 1].paths;
     }
-
-    // Finally, if user added one character to the input field, find new paths based on saved paths 
-    if (newInputLength === savedInputLength + 1) {
+    // Finally, if user added one character to the input field, find new paths based on saved paths
+    else if (newInputLength === savedInputLength + 1) {
       let extendedPaths = GameBoardState.extendPaths.call(this, newInput[newInputLength - 1]);
       // since the above may create duplicate paths, check for and remove duplicate paths
       if (extendedPaths > 1) {
@@ -134,8 +151,18 @@ class GameBoardState {
           paths: extendedPaths
         }
       );
-      return extendedPaths;
+      newPaths = extendedPaths;
     }
+
+    // create object of paths and primary path index for return to Play.js
+    const pathsObj = {paths: []};
+    for (let i = 0; i < newPaths.length; i++) {
+      pathsObj.paths.push(newPaths[i].path);
+      if (newPaths[i].primary) {
+        pathsObj.primaryPathIdx = i;
+      }
+    }
+    return pathsObj;
   }
 
   static extendPaths(letter) {
@@ -145,8 +172,8 @@ class GameBoardState {
 
     // for each old path
     for (let i = 0; i < oldPaths.length; i++) {
-      const currColumn = +oldPaths[i].path.slice(-1)[0];
-      const currRow = +oldPaths[i].path.slice(-1)[1];
+      const currColumn = +oldPaths[i].path[oldPaths[i].path.length - 1][0];
+      const currRow = +oldPaths[i].path[oldPaths[i].path.length - 1][1];
       const foundPaths = [];
       let makePrimary = oldPaths[i].primary || makeNextPrimary;
       foundPaths.push(
@@ -170,10 +197,10 @@ class GameBoardState {
         // if you the letter we're looking for is found at this test bubble
         if (this.currentBoard[testColumn][testRow] === letter) {
           // if this path has not already been used in this path
-          if (!oldPath.includes(`${testColumn}${testRow}`)) {
+          if (!oldPath.path.includes(`${testColumn}${testRow}`)) {
             const foundPath = 
             {
-              path: [...oldPath, `${testColumn}${testRow}`], 
+              path: [...oldPath.path, `${testColumn}${testRow}`], 
               primary: makePrimary
             }
             if (makePrimary) makePrimary = false;
@@ -287,7 +314,6 @@ class GameBoardState {
       let distFromEndOfPathsArr = paths.length;
       // for each path in paths array
       for (let j = 0; distFromEndOfPathsArr > 0; j = paths.length - distFromEndOfPathsArr) {
-        console.log(primaryPathIdx);
         const currColumn = +paths[j][i - 1][0];
         const currRow = +paths[j][i - 1][1];
         // if column to the right is in bounds, test
