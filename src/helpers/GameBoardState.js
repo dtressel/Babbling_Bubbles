@@ -1,5 +1,3 @@
-import { LocalConvenienceStoreOutlined } from "@mui/icons-material";
-
 class GameBoardState {
   constructor(columns, rows, visibleNextRows) {
     this.columns = columns;
@@ -108,6 +106,11 @@ class GameBoardState {
       this.savedPaths = [];
       newPaths = this.findFullPaths(newInput);
     }
+    // if a character was deleted from the input field
+    else if (newInputLength === savedInputLength - 1) {
+      this.savedPaths.pop();
+      newPaths = this.savedPaths[this.savedPaths.length - 1].paths;
+    }
     // if new input is one character, find occurances of first letter
     else if (newInputLength === 1) {
       this.savedPaths = [];
@@ -132,11 +135,6 @@ class GameBoardState {
         }
       );
       newPaths = paths;
-    }
-    // if a character was deleted from the input field
-    else if (newInputLength === savedInputLength - 1) {
-      this.savedPaths.pop();
-      newPaths = this.savedPaths[this.savedPaths.legnth - 1].paths;
     }
     // Finally, if user added one character to the input field, find new paths based on saved paths
     else if (newInputLength === savedInputLength + 1) {
@@ -177,10 +175,10 @@ class GameBoardState {
       const foundPaths = [];
       let makePrimary = oldPaths[i].primary || makeNextPrimary;
       foundPaths.push(
-        GameBoardState.testNeighbors.call(this, currColumn, currRow, letter, oldPaths[i], makePrimary)
+        ...GameBoardState.testNeighbors.call(this, currColumn, currRow, letter, oldPaths[i], makePrimary)
       );
       if (makePrimary && !foundPaths.length) makeNextPrimary = true;
-      foundPathsCumulative.push(...foundPaths);
+      if (foundPaths.length) foundPathsCumulative.push(...foundPaths);
     }
     return foundPathsCumulative;
   }
@@ -196,7 +194,7 @@ class GameBoardState {
       for (let testRow = startRow; testRow <= endRow; testRow++) {
         // if you the letter we're looking for is found at this test bubble
         if (this.currentBoard[testColumn][testRow] === letter) {
-          // if this path has not already been used in this path
+          // if this bubble has not already been used in this path
           if (!oldPath.path.includes(`${testColumn}${testRow}`)) {
             const foundPath = 
             {
