@@ -76,6 +76,7 @@ class GameBoardState {
     Only one path should be set as primary: true
   */
   findPaths(newInput) {
+    console.log(this.savedPaths);
     let newPaths;
 
     let lastSavedPathsObj;
@@ -103,8 +104,7 @@ class GameBoardState {
     // This is necessary in case of an error, a user copy and pastes, or a user has 
     // a way to input multiple characters at once
     else if (savedInput !== newInput.slice(0, -1) && savedInput.slice(0, -1) !== newInput) {
-      this.savedPaths = [];
-      newPaths = this.findFullPaths(newInput);
+      newPaths = GameBoardState.findFullPaths.call(this, newInput);
     }
     // if a character was deleted from the input field
     else if (newInputLength === savedInputLength - 1) {
@@ -113,28 +113,7 @@ class GameBoardState {
     }
     // if new input is one character, find occurances of first letter
     else if (newInputLength === 1) {
-      this.savedPaths = [];
-      const paths = [];
-      for (let i = 0; i < this.columns; i++) {
-        for (let j = 0; j < this.rows; j++) {
-          if (newInput === this.currentBoard[i][j]) {
-            
-            if (!paths.length) {
-              paths.push({ path: [`${i}${j}`], primary: true });
-            }
-            else {
-              paths.push({ path: [`${i}${j}`], primary: false });
-            }
-          }
-        }
-      }
-      this.savedPaths.push(
-        {
-          input: newInput,
-          paths: paths
-        }
-      );
-      newPaths = paths;
+      newPaths = GameBoardState.findPathForFirstLetter.call(this, newInput);
     }
     // Finally, if user added one character to the input field, find new paths based on saved paths
     else if (newInputLength === savedInputLength + 1) {
@@ -161,6 +140,54 @@ class GameBoardState {
       }
     }
     return pathsObj;
+  }
+
+  static findFullPaths(newInput) {
+    let finalPaths;
+    // will update this.savedPaths; we do not need return value
+    GameBoardState.findPathForFirstLetter.call(this, newInput[0]);
+    // loop through middle letters in newInput
+    for (let i = 1; i < newInput.length; i++) {
+      let extendedPaths = GameBoardState.extendPaths.call(this, newInput[i]);
+      // since the above may create duplicate paths, check for and remove duplicate paths
+      if (extendedPaths > 1) {
+        GameBoardState.removeDuplicatePaths(extendedPaths);
+      }
+      this.savedPaths.push(
+        {
+          input: newInput.slice(0, i + 1),
+          paths: extendedPaths
+        }
+      );
+      finalPaths = extendedPaths;
+    }
+    return finalPaths;
+    // find paths for last letter and save return value
+  }
+
+  static findPathForFirstLetter(letter) {
+    this.savedPaths = [];
+    const paths = [];
+    for (let i = 0; i < this.columns; i++) {
+      for (let j = 0; j < this.rows; j++) {
+        if (letter === this.currentBoard[i][j]) {
+          
+          if (!paths.length) {
+            paths.push({ path: [`${i}${j}`], primary: true });
+          }
+          else {
+            paths.push({ path: [`${i}${j}`], primary: false });
+          }
+        }
+      }
+    }
+    this.savedPaths.push(
+      {
+        input: letter,
+        paths: paths
+      }
+    );
+    return paths;
   }
 
   static extendPaths(letter) {
@@ -254,129 +281,6 @@ class GameBoardState {
         }
       }
     }
-  }
-
-  // find all paths of instances of newInputing
-  findFullPaths(newInput, primaryPathIdx) {
-    // creates an array of arrays
-    // each inner array is an array of coordinates for each step in the path
-    const paths = [];
-    function testColumnsOfNeighbors(testColumn, currRow, i, j, gameInstance) {
-      // Omit testing the row below the bottom-most row
-      let testUntilRow = 1;
-      // if currRow is the bottom-most row
-      if (currRow === gameInstance.rows - 1) {
-        testUntilRow = 0;
-      }
-      // for each of the neighboring letters in the test column
-      for (let k = -1; k <= testUntilRow; k++) {
-        // if you the letter we're looking for is found at this test path
-        if (gameInstance.currentBoard[testColumn][currRow + k] === newInput[i]) {
-          // if this path has not already been used in this path
-          if (!paths[j].includes(`${testColumn}${currRow + k}`)) {
-            // if this is not the only matching neighbor
-            if (paths[j].length > i) {
-              const newPath = paths[j].slice(0, -1);
-              newPath.push(`${testColumn}${currRow + k}`);
-              paths.splice(j + 1, 0, newPath);
-              if (i === newInput.length - 1 && j < primaryPathIdx) {
-                primaryPathIdx++;
-              }
-            } 
-            // else if this is the only matching neighbor so far
-            else {
-              paths[j].push(`${testColumn}${currRow + k}`);
-            }
-          }
-        }
-      }
-    }
-
-    // find occurances of first letter
-    for (let i = 0; i < this.columns; i++) {
-      for (let j = 0; j < this.rows; j++) {
-        if (newInput[0] === this.currentBoard[i][j]) {
-          paths.push([`${i}${j}`]);
-        }
-      }
-    }
-    // build paths for rest of new input
-    // for each letter of new input after first letter
-    for (let i = 1; i < newInput.length; i++) {
-      // Will loop through paths using 'distFromEndOfPathsArr' variable since we'll be adding
-      // new paths after current testing path and before next testing path
-      // and will need to skip the added paths or else we'll get an infinite loop.
-      // 'j' will still be an incrementing variable starting at 0 but will skip indices 
-      // based on the potentially increasing length of paths.
-      // This looping method will also cause us to avoid skipping paths when deleting one.
-      let distFromEndOfPathsArr = paths.length;
-      // for each path in paths array
-      for (let j = 0; distFromEndOfPathsArr > 0; j = paths.length - distFromEndOfPathsArr) {
-        const currColumn = +paths[j][i - 1][0];
-        const currRow = +paths[j][i - 1][1];
-        // if column to the right is in bounds, test
-        if (currColumn + 1 < this.columns) {
-          testColumnsOfNeighbors(currColumn + 1, currRow, i, j, this);
-        }
-        // test currColumn
-        testColumnsOfNeighbors(currColumn, currRow, i, j, this);
-        // if the left adjacent column is in bounds, test
-        if (currColumn - 1 >= 0) {
-          testColumnsOfNeighbors(currColumn - 1, currRow, i, j, this);
-        }
-        // if no neighbors matched, delete this path
-        if (paths[j].length === i) {
-          paths.splice(j, 1);
-        }
-        distFromEndOfPathsArr--;
-      }
-    }
-    // check for duplicate paths
-    if (newInput.length > 1 && paths.length > 1) {
-      // sum the coordinates (as a number) of each path and add to Array
-      const sumsArr = [];
-      for (let i = 0; i < paths.length; i++) {
-        sumsArr.push(paths[i].reduce((sum, curr) => +sum + +curr));
-      }
-      // check for duplicate sums
-      const duplicates = [];
-      for (let i = 0; i < sumsArr.length; i++) {
-        for (let j = 1 + i; j < sumsArr.length; j++) {
-          if (sumsArr[i] === sumsArr[j]) {
-            duplicates.push([i, j]);
-          }
-        }
-      }
-      // if two paths have a duplicate sum, they may be the same path so check
-      if (duplicates.length > 0) {
-        let indicesToDelete = [];
-        for (let i = 0; i < duplicates.length; i++) {
-          // join paths with same sums into a set
-          const testSet = new Set([...paths[duplicates[i][0]], ...paths[duplicates[i][1]]]);
-          // if size of the set is the same as the size of a path, remove path
-          if (testSet.size === paths[0].length) {
-            // push indices to delete into an array
-            indicesToDelete.push(duplicates[i][1]);
-          }
-        }
-        // if there are indices to delete
-        if (indicesToDelete.length) {
-          // remove any duplicate indices
-          indicesToDelete = [...new Set(indicesToDelete)];
-          // sort them from largest to smallest
-          indicesToDelete.sort((a, b) => (b - a));
-          // remove all indices from paths
-          for (let i = 0; i < indicesToDelete.length; i++) {
-            paths.splice(indicesToDelete[i], 1);
-            // if indexToDelete is below are the same as the primaryPathIdx, decrement
-            if (indicesToDelete[i] <= primaryPathIdx) {
-              primaryPathIdx--;
-            }
-          }
-        }
-      }
-    }
-    return {paths, primaryPathIdx};
   }
 
   static chooseLetters(numOfLetters) {
