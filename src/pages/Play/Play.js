@@ -67,9 +67,12 @@ function Play() {
     }
     else {
       setWordInput(str);
-      const locationObj = gameInstance.current.findPaths(str, primaryPathIdx)
-      setPaths(locationObj.paths);
-      setPrimaryPathIdx(locationObj.primaryPathIdx);
+      if (paths.primaryPathIdx !== primaryPathIdx) {
+        gameInstance.current.setPrimaryPathIdx(primaryPathIdx);
+      }
+      const pathsObj = gameInstance.current.findPaths(str);
+      setPaths(pathsObj.paths);
+      setPrimaryPathIdx(pathsObj.primaryPathIdx);
     }
   }
   
@@ -79,6 +82,7 @@ function Play() {
     setWordInput('');
     setPaths([]);
     setPrimaryPathIdx(0);
+    gameInstance.current.savedPaths = [];
   }
 
   if (notStarted) {
