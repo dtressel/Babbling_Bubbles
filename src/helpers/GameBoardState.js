@@ -13,11 +13,11 @@ class GameBoardState {
           paths: [
             {
               path: ["01"],
-              primary: true
+              flag: 0
             },
             {
               path: ["23"],
-              primary: false
+              flag: 1
             }
           ]
         },
@@ -26,15 +26,17 @@ class GameBoardState {
           paths: [
             {
               path: ["01", "12"],
-              primary: true
+              flag: 0
             },
             {
               path: ["23", "12"],
-              primary: false
+              flag: 1
             }
           ]
         }
       ]
+
+      flag values: 0: primary, 1: secondary, 2: relevant duplicates
     */
     this.savedPaths = [];
   }
@@ -49,14 +51,13 @@ class GameBoardState {
   }
 
   setPrimaryPathIdx(idx) {
-    const savedPathsLength = this.savedPaths.length;
-    const lastSavedPaths = this.savedPaths[savedPathsLength - 1];
-    if (!savedPathsLength) return;
+    const lastSavedPaths = this.savedPaths.slice(-1)[0];
+    if (!lastSavedPaths) return;
     // clear old primaryPathIdx info
-    for (let i = 0; i < lastSavedPaths.length; i++) {
-      lastSavedPaths.paths[i].primary = false;
+    for (let i = 0; i < lastSavedPaths.paths.length; i++) {
+      lastSavedPaths.paths[i].flag = 1;
     }
-    lastSavedPaths.paths[idx].primary = true;
+    lastSavedPaths.paths[idx].flag = 0;
   }
 
   /* 
@@ -66,14 +67,14 @@ class GameBoardState {
       [
         {
           path: ["01", "12"],
-          primary: true
+          flag: 0
         },
         {
           path: ["23", "12"],
-          primary: false
+          flag: 1
         }
       ]
-    Only one path should be set as primary: true
+    Only one path should be set as flag: 0
   */
   findPaths(newInput) {
     console.log(this.savedPaths);
@@ -119,7 +120,7 @@ class GameBoardState {
     else if (newInputLength === savedInputLength + 1) {
       let extendedPaths = GameBoardState.extendPaths.call(this, newInput[newInputLength - 1]);
       // since the above may create duplicate paths, check for and remove duplicate paths
-      if (extendedPaths > 1) {
+      if (extendedPaths.length > 1) {
         GameBoardState.removeDuplicatePaths(extendedPaths);
       }
       this.savedPaths.push(
@@ -135,7 +136,7 @@ class GameBoardState {
     const pathsObj = {paths: []};
     for (let i = 0; i < newPaths.length; i++) {
       pathsObj.paths.push(newPaths[i].path);
-      if (newPaths[i].primary) {
+      if (newPaths[i].flag === 0) {
         pathsObj.primaryPathIdx = i;
       }
     }
@@ -150,7 +151,7 @@ class GameBoardState {
     for (let i = 1; i < newInput.length; i++) {
       let extendedPaths = GameBoardState.extendPaths.call(this, newInput[i]);
       // since the above may create duplicate paths, check for and remove duplicate paths
-      if (extendedPaths > 1) {
+      if (extendedPaths.length > 1) {
         GameBoardState.removeDuplicatePaths(extendedPaths);
       }
       this.savedPaths.push(
@@ -173,10 +174,10 @@ class GameBoardState {
         if (letter === this.currentBoard[i][j]) {
           
           if (!paths.length) {
-            paths.push({ path: [`${i}${j}`], primary: true });
+            paths.push({ path: [`${i}${j}`], flag: 0 });
           }
           else {
-            paths.push({ path: [`${i}${j}`], primary: false });
+            paths.push({ path: [`${i}${j}`], flag: 1 });
           }
         }
       }
@@ -192,7 +193,7 @@ class GameBoardState {
 
   static extendPaths(letter) {
     const oldPaths = this.savedPaths[this.savedPaths.length - 1].paths;
-    let makeNextPrimary = false;
+    let makePrimary = false;
     const foundPathsCumulative = [];
 
     // for each old path
@@ -200,12 +201,15 @@ class GameBoardState {
       const currColumn = +oldPaths[i].path[oldPaths[i].path.length - 1][0];
       const currRow = +oldPaths[i].path[oldPaths[i].path.length - 1][1];
       const foundPaths = [];
-      let makePrimary = oldPaths[i].primary || makeNextPrimary;
+      if (oldPaths[i].flag === 0) makePrimary = true;
       foundPaths.push(
         ...GameBoardState.testNeighbors.call(this, currColumn, currRow, letter, oldPaths[i], makePrimary)
       );
-      if (makePrimary && !foundPaths.length) makeNextPrimary = true;
+      if (makePrimary && foundPaths.length) makePrimary = false;
       if (foundPaths.length) foundPathsCumulative.push(...foundPaths);
+    }
+    if (makePrimary && foundPathsCumulative.length) {
+      foundPathsCumulative[foundPathsCumulative.length - 1].flag = 0;
     }
     return foundPathsCumulative;
   }
@@ -226,7 +230,7 @@ class GameBoardState {
             const foundPath = 
             {
               path: [...oldPath.path, `${testColumn}${testRow}`], 
-              primary: makePrimary
+              flag: makePrimary ? 0 : 1
             }
             if (makePrimary) makePrimary = false;
             foundPaths.push(foundPath);
@@ -241,7 +245,7 @@ class GameBoardState {
     // sum the coordinates (as a number) of each path and add to Array
     const sumsArr = [];
     for (let i = 0; i < extendedPaths.length; i++) {
-      sumsArr.push(extendedPaths[i].reduce((sum, curr) => +sum + +curr));
+      sumsArr.push(extendedPaths[i].path.reduce((sum, curr) => +sum + +curr));
     }
     // check for duplicate sums
     // duplicates array will be an array of arrays of pairs of extendedPaths indices with duplicate sums
@@ -258,7 +262,7 @@ class GameBoardState {
       let indicesToDelete = [];
       for (let i = 0; i < duplicates.length; i++) {
         // join paths with same sums into a set
-        const testSet = new Set([...extendedPaths[duplicates[i][0]], ...extendedPaths[duplicates[i][1]]]);
+        const testSet = new Set([...extendedPaths[duplicates[i][0]].path, ...extendedPaths[duplicates[i][1]].path]);
         // if size of the set is the same as the size of a path, remove path
         if (testSet.size === extendedPaths[0].path.length) {
           // push indices to delete into an array
@@ -266,8 +270,8 @@ class GameBoardState {
           // if index to delete is primary index, make other duplicate primary
           // in case of 3 or more duplicates, this will still work
           indicesToDelete.push(indexToDelete);
-          if (extendedPaths[indexToDelete].primary) {
-            extendedPaths[duplicates[i][0]].primary = true;
+          if (extendedPaths[indexToDelete].flag === 0) {
+            extendedPaths[duplicates[i][0]].flag = 0;
           }
         }
       }
@@ -275,6 +279,8 @@ class GameBoardState {
       if (indicesToDelete.length) {
         // remove any duplicate indices
         indicesToDelete = [...new Set(indicesToDelete)];
+        // sort them from largest to smallest so that correct indices will be deleted
+        indicesToDelete.sort((a, b) => (b - a));
         // remove all indices from paths
         for (let i = 0; i < indicesToDelete.length; i++) {
           extendedPaths.splice(indicesToDelete[i], 1);

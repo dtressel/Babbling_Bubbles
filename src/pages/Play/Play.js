@@ -67,7 +67,9 @@ function Play() {
     }
     else {
       setWordInput(str);
-      if (paths.primaryPathIdx !== primaryPathIdx) {
+      console.log(gameInstance.current.savedPaths.slice(-1));
+      if (gameInstance.current.savedPaths.length 
+        && gameInstance.current.savedPaths.slice(-1)[0].paths[primaryPathIdx].flag !== 0) {
         gameInstance.current.setPrimaryPathIdx(primaryPathIdx);
       }
       const pathsObj = gameInstance.current.findPaths(str);
