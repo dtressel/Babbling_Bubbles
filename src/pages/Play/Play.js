@@ -8,8 +8,6 @@ const COLUMNS = 5;
 const ROWS = 4;
 const VISIBLE_NEXT_ROWS = 2;
 
-// new-locations branch
-
 function Play() {
   const [notStarted, setNotStarted] = useState(true);
   const [gameInProgress, setGameInProgress] = useState(false);
@@ -59,6 +57,7 @@ function Play() {
 
   const handleChange = (evt) => {
     let str = evt.target.value;
+    if (str.length > gameInstance.current.rows * gameInstance.current.columns) return;
     if (str[str.length - 1] === ' ') {
       str = str.slice(0, -1);
       setPrimaryPathIdx((primaryPathIdx) => (
@@ -67,8 +66,8 @@ function Play() {
     }
     else {
       setWordInput(str);
-      console.log(gameInstance.current.savedPaths.slice(-1));
       if (gameInstance.current.savedPaths.length 
+        && gameInstance.current.savedPaths.slice(-1)[0].paths.length
         && gameInstance.current.savedPaths.slice(-1)[0].paths[primaryPathIdx].flag !== 0) {
         gameInstance.current.setPrimaryPathIdx(primaryPathIdx);
       }

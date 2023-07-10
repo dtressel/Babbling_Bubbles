@@ -1,3 +1,11 @@
+/* 
+  Improvements to make:
+    1. if deleting more than one character check for match starting with first character
+    2. if adding more than one charcter check for subset already recorded
+    3. "pass up" primary index changes so deletes will follow primary path 
+*/ 
+
+
 class GameBoardState {
   constructor(columns, rows, visibleNextRows) {
     this.columns = columns;
@@ -98,19 +106,19 @@ class GameBoardState {
     }
     // if input field is unchanged yet somehow this function was called, set newPaths as formerly saved paths
     else if (newInput === savedInput) {
-      newPaths = lastSavedPathsObj.paths;
+      newPaths = lastSavedPathsObj.paths.filter((path) => path.flag !== 2);
     }
     // if the newInput passed is not one less or one more character than the last input value
     // then use alternative method 'findFullPaths' to find paths.
     // This is necessary in case of an error, a user copy and pastes, or a user has 
     // a way to input multiple characters at once
     else if (savedInput !== newInput.slice(0, -1) && savedInput.slice(0, -1) !== newInput) {
-      newPaths = GameBoardState.findFullPaths.call(this, newInput);
+      newPaths = GameBoardState.findFullPaths.call(this, newInput).filter((path) => path.flag !== 2);
     }
     // if a character was deleted from the input field
     else if (newInputLength === savedInputLength - 1) {
       this.savedPaths.pop();
-      newPaths = this.savedPaths[this.savedPaths.length - 1].paths;
+      newPaths = this.savedPaths[this.savedPaths.length - 1].paths.filter((path) => path.flag !== 2);
     }
     // if new input is one character, find occurances of first letter
     else if (newInputLength === 1) {
@@ -129,7 +137,8 @@ class GameBoardState {
           paths: extendedPaths
         }
       );
-      newPaths = extendedPaths;
+      // filter out relevant duplicates for send to Play.js
+      newPaths = extendedPaths.filter((path) => path.flag !== 2);
     }
 
     // create object of paths and primary path index for return to Play.js
@@ -145,8 +154,9 @@ class GameBoardState {
 
   static findFullPaths(newInput) {
     let finalPaths;
-    // will update this.savedPaths; we do not need return value
-    GameBoardState.findPathForFirstLetter.call(this, newInput[0]);
+    // update this.savedPaths and set return to finalPaths
+    // finalPaths will be redefined if newInput is more than one letter
+    finalPaths = GameBoardState.findPathForFirstLetter.call(this, newInput[0]);
     // loop through middle letters in newInput
     for (let i = 1; i < newInput.length; i++) {
       let extendedPaths = GameBoardState.extendPaths.call(this, newInput[i]);
@@ -162,6 +172,7 @@ class GameBoardState {
       );
       finalPaths = extendedPaths;
     }
+    console.log(finalPaths);
     return finalPaths;
     // find paths for last letter and save return value
   }
@@ -265,13 +276,23 @@ class GameBoardState {
         const testSet = new Set([...extendedPaths[duplicates[i][0]].path, ...extendedPaths[duplicates[i][1]].path]);
         // if size of the set is the same as the size of a path, remove path
         if (testSet.size === extendedPaths[0].path.length) {
-          // push indices to delete into an array
-          const indexToDelete = duplicates[i][1];
-          // if index to delete is primary index, make other duplicate primary
+          // mark second path for deleltion
+          const indexToKeep = duplicates[i][0];
+          const indexQuarentined = duplicates[i][1];
+          // if quarentined index is primary index, make other duplicate primary
           // in case of 3 or more duplicates, this will still work
-          indicesToDelete.push(indexToDelete);
-          if (extendedPaths[indexToDelete].flag === 0) {
-            extendedPaths[duplicates[i][0]].flag = 0;
+          if (extendedPaths[indexQuarentined].flag === 0) {
+            extendedPaths[indexToKeep].flag = 0;
+          }
+          // if they have the same ending bubble, delete path
+          if (extendedPaths[indexToKeep].path.slice(-1)[0] 
+            === extendedPaths[indexQuarentined].path.slice(-1)[0]) {
+            // push indices to delete into an array
+            indicesToDelete.push(indexQuarentined);
+          }
+          // else if they have different ending bubbles, mark as relevant duplicate
+          else {
+            extendedPaths[indexQuarentined].flag = 2;
           }
         }
       }
