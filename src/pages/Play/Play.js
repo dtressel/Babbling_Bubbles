@@ -19,6 +19,8 @@ function Play() {
   const [paths, setPaths] = useState([]);
   const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
 
+  console.log(paths);
+
   const intervalId = useRef();
   const gameInstance = useRef();
   let timeDisplay;
@@ -57,7 +59,7 @@ function Play() {
 
   const handleChange = (evt) => {
     let str = evt.target.value;
-    if (str.length > gameInstance.current.rows * gameInstance.current.columns) return;
+    if (str.length > COLUMNS * ROWS) return;
     if (str[str.length - 1] === ' ') {
       str = str.slice(0, -1);
       setPrimaryPathIdx((primaryPathIdx) => (
@@ -71,7 +73,7 @@ function Play() {
         && gameInstance.current.savedPaths.slice(-1)[0].paths[primaryPathIdx].flag !== 0) {
         gameInstance.current.setPrimaryPathIdx(primaryPathIdx);
       }
-      const pathsObj = gameInstance.current.findPaths(str);
+      const pathsObj = gameInstance.current.findPaths(str.toUpperCase());
       setPaths(pathsObj.paths);
       setPrimaryPathIdx(pathsObj.primaryPathIdx);
     }
@@ -79,7 +81,13 @@ function Play() {
   
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    setResult(wordDictionary.includes(wordInput) ? "Yes" : "Nope");
+    const submittedWord = wordInput.toLowerCase();
+    if (paths.length) {
+      setResult(wordDictionary.includes(submittedWord) ? `${submittedWord} found!` : `${submittedWord} not a word`);
+    }
+    else {
+      setResult(`${submittedWord} not on board`);
+    }
     setWordInput('');
     setPaths([]);
     setPrimaryPathIdx(0);
