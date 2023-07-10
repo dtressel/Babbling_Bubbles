@@ -18,16 +18,16 @@ function Play() {
   const [timer, setTimer] = useState(180);
   const [wordInput, setWordInput] = useState('');
   const [result, setResult] = useState('');
-  const [locations, setLocations] = useState([]);
-  const [primaryLocationIdx, setPrimaryLocationIdx] = useState(0);
+  const [paths, setPaths] = useState([]);
+  const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
 
   const intervalId = useRef();
   const gameInstance = useRef();
   let timeDisplay;
-  const primaryLocation = new Set(locations[primaryLocationIdx]);
-  const secondaryLocations = new Set([
-    ...locations.slice(0, primaryLocationIdx),
-    ...locations.slice(primaryLocationIdx + 1)
+  const primaryLocation = new Set(paths[primaryPathIdx]);
+  const secondaryPaths = new Set([
+    ...paths.slice(0, primaryPathIdx),
+    ...paths.slice(primaryPathIdx + 1)
   ].flat());
 
   if (timer === 0) {
@@ -59,17 +59,23 @@ function Play() {
 
   const handleChange = (evt) => {
     let str = evt.target.value;
+    if (str.length > gameInstance.current.rows * gameInstance.current.columns) return;
     if (str[str.length - 1] === ' ') {
       str = str.slice(0, -1);
-      setPrimaryLocationIdx((primaryLocationIdx) => (
-        (primaryLocationIdx >= locations.length - 1) ? 0 : primaryLocationIdx + 1
+      setPrimaryPathIdx((primaryPathIdx) => (
+        (primaryPathIdx >= paths.length - 1) ? 0 : primaryPathIdx + 1
       ));
     }
     else {
       setWordInput(str);
-      const locationObj = gameInstance.current.findLocations(str, primaryLocationIdx)
-      setLocations(locationObj.locations);
-      setPrimaryLocationIdx(locationObj.primaryLocationIdx);
+      if (gameInstance.current.savedPaths.length 
+        && gameInstance.current.savedPaths.slice(-1)[0].paths.length
+        && gameInstance.current.savedPaths.slice(-1)[0].paths[primaryPathIdx].flag !== 0) {
+        gameInstance.current.setPrimaryPathIdx(primaryPathIdx);
+      }
+      const pathsObj = gameInstance.current.findPaths(str);
+      setPaths(pathsObj.paths);
+      setPrimaryPathIdx(pathsObj.primaryPathIdx);
     }
   }
   
@@ -77,8 +83,9 @@ function Play() {
     evt.preventDefault();
     setResult(wordDictionary.includes(wordInput) ? "Yes" : "Nope");
     setWordInput('');
-    setLocations([]);
-    setPrimaryLocationIdx(0);
+    setPaths([]);
+    setPrimaryPathIdx(0);
+    gameInstance.current.savedPaths = [];
   }
 
   if (notStarted) {
@@ -121,7 +128,7 @@ function Play() {
                         {`
                           Play-letter-bubble 
                           ${primaryLocation.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
-                            secondaryLocations.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
+                            secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
                         `}
                       key={`${columnIdx}${rowIdx}`}
                     >
