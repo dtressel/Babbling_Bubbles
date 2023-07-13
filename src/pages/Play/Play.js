@@ -16,15 +16,18 @@ function Play() {
   const [timer, setTimer] = useState(180);
   const [wordInput, setWordInput] = useState('');
   const [result, setResult] = useState('');
+  const [resultShowing, setResultShowing] = useState(false);
   const [paths, setPaths] = useState([]);
   const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
 
   console.log(paths);
 
-  const intervalId = useRef();
+  const timerIntervalId = useRef();
+  const resultTimeoutId = useRef();
   const gameInstance = useRef();
+
   let timeDisplay;
-  const primaryLocation = new Set(paths[primaryPathIdx]);
+  const primaryPath = new Set(paths[primaryPathIdx]);
   const secondaryPaths = new Set([
     ...paths.slice(0, primaryPathIdx),
     ...paths.slice(primaryPathIdx + 1)
@@ -33,7 +36,7 @@ function Play() {
   if (timer === 0) {
     setGameFinished(true);
     setGameInProgress(false);
-    clearInterval(intervalId.current);
+    clearInterval(timerIntervalId.current);
     setTimer(null);
   }
 
@@ -50,7 +53,7 @@ function Play() {
     setTimeout(() => {
       setCountdown(0);
       setGameInProgress(true);
-      intervalId.current = setInterval(() => {
+      timerIntervalId.current = setInterval(() => {
         setTimer((timer) => timer - 1);
       }, 1000);
     }, 3000);
@@ -83,10 +86,31 @@ function Play() {
     evt.preventDefault();
     const submittedWord = wordInput.toLowerCase();
     if (paths.length) {
-      setResult(wordDictionary.includes(submittedWord) ? `${submittedWord} found!` : `${submittedWord} not a word`);
+      if (wordDictionary.includes(submittedWord)) {
+        setResult(`${submittedWord} found!`);
+        setResultShowing(true);
+        clearTimeout(resultTimeoutId.current);
+        resultTimeoutId.current = setTimeout(() => {
+          setResultShowing(false);
+        }, 1000);
+        gameInstance.current.popBubbles([...primaryPath]);
+      }
+      else {
+        setResult(`${submittedWord} not a word`);
+        setResultShowing(true);
+        clearTimeout(resultTimeoutId.current);
+        resultTimeoutId.current = setTimeout(() => {
+          setResultShowing(false);
+        }, 1000);
+      }
     }
     else {
       setResult(`${submittedWord} not on board`);
+      setResultShowing(true);
+      clearTimeout(resultTimeoutId.current);
+      resultTimeoutId.current = setTimeout(() => {
+        setResultShowing(false);
+      }, 1000);
     }
     setWordInput('');
     setPaths([]);
@@ -133,7 +157,7 @@ function Play() {
                       className=
                         {`
                           Play-letter-bubble 
-                          ${primaryLocation.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
+                          ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
                             secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
                         `}
                       key={`${columnIdx}${rowIdx}`}
@@ -151,7 +175,7 @@ function Play() {
           <input type='text' onChange={handleChange} value={wordInput} />
           <button type='submit'>check</button>
         </form>
-        <div>{result}</div>
+        <div className={resultShowing ? undefined : 'Play-result-hidden'}>{result}</div>
       </div>
     )
   }

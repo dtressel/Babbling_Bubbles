@@ -12,6 +12,7 @@ class GameBoardState {
     this.rows = rows;
     this.visibleNextRows = visibleNextRows;
     this.hiddenNextRows = rows;
+    this.totalRows = this.rows + this.visibleNextRows + this.hiddenNextRows;
     this.currentBoard = this.createNewBoard();
     /* 
       this.savedPaths is an array of objects of paths for a built string structured like:
@@ -56,6 +57,22 @@ class GameBoardState {
       gameBoard.push(GameBoardState.chooseLetters(this.rows + this.visibleNextRows + this.hiddenNextRows));
     }
     return gameBoard;
+  }
+
+  popBubbles(bubbles) {
+    // sort bubbles from highest to lowest so splicing by index removes correct bubble
+    bubbles.sort((a, b) => b - a);
+    for (const bubble of bubbles) {
+      const x = bubble[0];
+      const y = bubble[1];
+      const deletedBubbles = this.currentBoard[x].splice(y, 1);
+      GameBoardState.addNewBubbles.call(this, x, 1);
+    }
+  }
+
+  static addNewBubbles(column, numOfBubbles) {
+    const newLetters = GameBoardState.chooseLetters(numOfBubbles);
+    this.currentBoard[column].push(...newLetters);
   }
 
   setPrimaryPathIdx(idx) {

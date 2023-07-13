@@ -27,3 +27,8 @@
 .Play-secondary-location {
   background-color: rgb(162, 162, 162);
 }
+
+.Play-result-hidden {
+  opacity: 0;
+  transition: opacity 500ms ease-out;
+}
