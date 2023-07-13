@@ -20,8 +20,6 @@ function Play() {
   const [paths, setPaths] = useState([]);
   const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
 
-  console.log(paths);
-
   const timerIntervalId = useRef();
   const resultTimeoutId = useRef();
   const gameInstance = useRef();
@@ -93,7 +91,7 @@ function Play() {
         resultTimeoutId.current = setTimeout(() => {
           setResultShowing(false);
         }, 1000);
-        gameInstance.current.popBubbles([...primaryPath]);
+        const emptySpaces = gameInstance.current.popBubbles([...primaryPath]);
       }
       else {
         setResult(`${submittedWord} not a word`);

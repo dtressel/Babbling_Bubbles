@@ -62,17 +62,49 @@ class GameBoardState {
   popBubbles(bubbles) {
     // sort bubbles from highest to lowest so splicing by index removes correct bubble
     bubbles.sort((a, b) => b - a);
+    const poppedByColumn = new Array(this.columns);
     for (const bubble of bubbles) {
-      const x = bubble[0];
-      const y = bubble[1];
-      const deletedBubbles = this.currentBoard[x].splice(y, 1);
+      const x = +bubble[0];
+      const y = +bubble[1];
+      // add bubble to poppedByColumn
+      if (poppedByColumn[x]) {
+        poppedByColumn[x].unshift(y);
+      } 
+      else {
+        poppedByColumn[x] = [y];
+      }
+      this.currentBoard[x].splice(y, 1);
       GameBoardState.addNewBubbles.call(this, x, 1);
     }
+    return GameBoardState.calcEmptySpaces(poppedByColumn);
   }
 
   static addNewBubbles(column, numOfBubbles) {
     const newLetters = GameBoardState.chooseLetters(numOfBubbles);
     this.currentBoard[column].push(...newLetters);
+  }
+
+  static calcEmptySpaces(poppedByColumn) {
+    return poppedByColumn.map((column) => {
+      if (!column) return null;
+      let spaces = [];
+      let lastPopped = -2;
+      for (const popped of column) {
+        console.log('popped = ', popped);
+        console.log('last popped = ', lastPopped);
+        if (popped === lastPopped + 1) {
+          spaces[spaces.length - 1].numOfSpaces++;
+        }
+        else {
+          const currEmptySpots = spaces.reduce((accum, curr) => {
+            return accum + curr.numOfSpaces;
+          }, 0);
+          spaces.push({ numOfSpaces: 1, before: popped - currEmptySpots })
+        }
+        lastPopped = popped;
+      }
+      return spaces;
+    });
   }
 
   setPrimaryPathIdx(idx) {
