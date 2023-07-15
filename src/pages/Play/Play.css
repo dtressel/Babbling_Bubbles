@@ -9,6 +9,8 @@
 
 .Play-game-board {
   background-color: rgb(0, 234, 255);
+  max-height: 14.4rem;
+  overflow: hidden;
 }
 
 .Play-extra-bubbles > div {
@@ -20,15 +22,14 @@
 }
 
 .Play-letter-bubble, .Play-empty-bubble-space {
-  width: 2rem;
+  width: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .Play-letter-bubble{
-  padding: 0.5rem;
-  height: 2rem;
+  height: 3rem;
   margin: 0 0.4rem 0.6rem;
   border: 1px solid gray;
   border-radius: 50%;
@@ -36,9 +37,8 @@
 }
 
 .Play-empty-bubble-space {
-  margin: 0 0.5rem;
-  padding: 0 0.4rem;
-  transition: height 300ms;
+  margin: 0 0.4rem;
+  transition: height 800ms;
   height: 3.6rem;
 }
 
@@ -48,8 +48,7 @@
 
 .Play-collapse {
   height: 0;
-  margin: 0 0.5rem;
-  padding: 0 0.4rem;
+  margin: 0 0.4rem;
 }
 
 .Play-primary-location {

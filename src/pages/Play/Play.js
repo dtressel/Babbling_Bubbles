@@ -99,11 +99,11 @@ function Play() {
         setEmptySpaces(emptySpaces);
         setTimeout(() => {
           setPopCollapse(true);
-        }, 50);
+        }, 200);
         setTimeout(() => {
           setEmptySpaces(EMPTY_SPACES_INITIAL_VALUE);
           setPopCollapse(false);
-        }, 400);
+        }, 1000);
       }
       else {
         setResult(`${submittedWord} not a word`);
@@ -195,7 +195,7 @@ function Play() {
             )
           })}
         </div>
-        <div className='Play-extra-bubbles'>
+        {/* <div className='Play-extra-bubbles'>
           <div>
             {gameInstance.current.currentBoard.map((column, columnIdx) => {
               return (
@@ -214,7 +214,7 @@ function Play() {
               )
             })}
           </div>
-        </div>
+        </div> */}
         <form onSubmit={handleSubmit}>
           <input type='text' onChange={handleChange} value={wordInput} />
           <button type='submit'>check</button>
