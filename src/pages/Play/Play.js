@@ -7,6 +7,7 @@ const wordDictionary = require('an-array-of-english-words');
 const COLUMNS = 5;
 const ROWS = 4;
 const VISIBLE_NEXT_ROWS = 2;
+const EMPTY_SPACES_INITIAL_VALUE = [...Array(COLUMNS)].map(() => ([]));
 
 function Play() {
   const [notStarted, setNotStarted] = useState(true);
@@ -18,6 +19,8 @@ function Play() {
   const [result, setResult] = useState('');
   const [resultShowing, setResultShowing] = useState(false);
   const [paths, setPaths] = useState([]);
+  const [emptySpaces, setEmptySpaces] = useState(EMPTY_SPACES_INITIAL_VALUE);
+  const [popCollapse, setPopCollapse] = useState(false);
   const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
 
   const timerIntervalId = useRef();
@@ -92,6 +95,15 @@ function Play() {
           setResultShowing(false);
         }, 1000);
         const emptySpaces = gameInstance.current.popBubbles([...primaryPath]);
+        console.log(emptySpaces);
+        setEmptySpaces(emptySpaces);
+        setTimeout(() => {
+          setPopCollapse(true);
+        }, 50);
+        setTimeout(() => {
+          setEmptySpaces(EMPTY_SPACES_INITIAL_VALUE);
+          setPopCollapse(false);
+        }, 400);
       }
       else {
         setResult(`${submittedWord} not a word`);
@@ -151,23 +163,57 @@ function Play() {
               <div key={columnIdx}>
                 {column.slice(0, ROWS).map((letter, rowIdx) => {
                   return (
-                    <div 
-                      className=
-                        {`
-                          Play-letter-bubble 
-                          ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
-                            secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
-                        `}
-                      key={`${columnIdx}${rowIdx}`}
-                    >
-                      {letter}
-                    </div>
+                    <>
+                      {emptySpaces[columnIdx][rowIdx] && 
+                        [...Array(emptySpaces[columnIdx][rowIdx])].map((ignore, idx) => {
+                          return (
+                            <div 
+                              className={`
+                                Play-empty-bubble-space 
+                                ${popCollapse ? 'Play-collapse' : undefined}
+                              `} 
+                              key={`empty-${columnIdx}${rowIdx}${idx}`}
+                            ></div>
+                          )
+                        })
+                      }
+                      <div 
+                        className=
+                          {`
+                            Play-letter-bubble 
+                            ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
+                              secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
+                          `}
+                        key={`${columnIdx}${rowIdx}`}
+                      >
+                        {letter}
+                      </div>
+                    </>
                   )
                 })}
               </div>
             )
-          })
-          }
+          })}
+        </div>
+        <div className='Play-extra-bubbles'>
+          <div>
+            {gameInstance.current.currentBoard.map((column, columnIdx) => {
+              return (
+                <div key={columnIdx}>
+                  {column.slice(ROWS, ROWS + VISIBLE_NEXT_ROWS).map((letter, rowIdx) => {
+                    return (
+                      <div 
+                        className='Play-letter-bubble Play-next-letters'
+                        key={`${columnIdx}${rowIdx}`}
+                      >
+                        {letter}
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            })}
+          </div>
         </div>
         <form onSubmit={handleSubmit}>
           <input type='text' onChange={handleChange} value={wordInput} />

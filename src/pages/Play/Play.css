@@ -2,22 +2,54 @@
   text-align: center;
 }
 
-.Play-game-board {
+.Play-game-board, .Play-extra-bubbles {
   display: flex;
   justify-content: center;
 }
 
-.Play-letter-bubble {
-  border: 1px solid gray;
-  padding: 0.5rem;
-  border-radius: 50%;
+.Play-game-board {
+  background-color: rgb(0, 234, 255);
+}
+
+.Play-extra-bubbles > div {
+  display: flex;
+}
+
+.Play-extra-bubbles {
+
+}
+
+.Play-letter-bubble, .Play-empty-bubble-space {
   width: 2rem;
-  height: 2rem;
-  margin: 0.6rem 0.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.Play-letter-bubble{
+  padding: 0.5rem;
+  height: 2rem;
+  margin: 0 0.4rem 0.6rem;
+  border: 1px solid gray;
+  border-radius: 50%;
   font-size: 1.5rem;
+}
+
+.Play-empty-bubble-space {
+  margin: 0 0.5rem;
+  padding: 0 0.4rem;
+  transition: height 300ms;
+  height: 3.6rem;
+}
+
+.Play-next-letters {
+  background-color: rgb(180, 180, 180);
+}
+
+.Play-collapse {
+  height: 0;
+  margin: 0 0.5rem;
+  padding: 0 0.4rem;
 }
 
 .Play-primary-location {

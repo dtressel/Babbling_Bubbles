@@ -62,7 +62,7 @@ class GameBoardState {
   popBubbles(bubbles) {
     // sort bubbles from highest to lowest so splicing by index removes correct bubble
     bubbles.sort((a, b) => b - a);
-    const poppedByColumn = new Array(this.columns);
+    const poppedByColumn = [...Array(this.columns)].map(() => ([]));
     for (const bubble of bubbles) {
       const x = +bubble[0];
       const y = +bubble[1];
@@ -76,7 +76,18 @@ class GameBoardState {
       this.currentBoard[x].splice(y, 1);
       GameBoardState.addNewBubbles.call(this, x, 1);
     }
-    return GameBoardState.calcEmptySpaces(poppedByColumn);
+    /* 
+      Empty spaces example:
+      [
+        [],
+        [undefined, 1, undefined, 1],
+        [undefined, undefined, 2],
+        [],
+        []
+      ]
+      There will be this.columns # of inner arrays
+    */
+    return GameBoardState.findEmptySpaces(poppedByColumn);
   }
 
   static addNewBubbles(column, numOfBubbles) {
@@ -84,22 +95,26 @@ class GameBoardState {
     this.currentBoard[column].push(...newLetters);
   }
 
-  static calcEmptySpaces(poppedByColumn) {
+  static findEmptySpaces(poppedByColumn) {
     return poppedByColumn.map((column) => {
       if (!column) return null;
+      /* 
+        example of spaces = [undefined, 2, undefined, 1]
+        meaning:
+          before 2nd spot there are 2 empty spaces
+          before 4th spot there is 1 empty space
+      */
       let spaces = [];
       let lastPopped = -2;
       for (const popped of column) {
-        console.log('popped = ', popped);
-        console.log('last popped = ', lastPopped);
         if (popped === lastPopped + 1) {
-          spaces[spaces.length - 1].numOfSpaces++;
+          spaces[spaces.length - 1]++;
         }
         else {
           const currEmptySpots = spaces.reduce((accum, curr) => {
-            return accum + curr.numOfSpaces;
+            return curr ? accum + curr : accum;
           }, 0);
-          spaces.push({ numOfSpaces: 1, before: popped - currEmptySpots })
+          spaces[popped - currEmptySpots] = 1;
         }
         lastPopped = popped;
       }
