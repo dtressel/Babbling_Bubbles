@@ -21,3 +21,9 @@
 .Footer-copyright > div {
   font-size: 0.8rem;
 }
+
+@media(max-width: 539px) {
+  .Footer-links {
+    display: none !important;
+  }
+}
