@@ -11,7 +11,7 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import Link from "@mui/material/Link";
+import { Link as ReactRouterLink } from "react-router-dom";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const barLinks = ["Play", "Leaderboards"];
@@ -61,7 +61,8 @@ function NavBar() {
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {barLinks.map((page) => (
                 <Button
-                  href={`/${page.toLowerCase().replaceAll(' ', '-')}`}
+                  component={ReactRouterLink}
+                  to={`/${page.toLowerCase().replaceAll(' ', '-')}`}
                   key={page}
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: "white", display: "block" }}
@@ -99,8 +100,8 @@ function NavBar() {
               >
                 {learnLinks.map((link) => (
                   <MenuItem 
-                    component={Link} 
-                    href={`/${link.toLowerCase().replaceAll(' ', '-')}`}
+                    component={ReactRouterLink} 
+                    to={`/${link.toLowerCase().replaceAll(' ', '-')}`}
                     key={link} 
                     onClick={handleCloseLearnMenu} 
                   >
@@ -114,8 +115,8 @@ function NavBar() {
             <Typography
               variant="h6"
               noWrap
-              component="a"
-              href="/"
+              component={ReactRouterLink}
+              to="/"
               sx={{
                 mr: 2,
                 display: { xs: "none", md: "flex" },
@@ -169,8 +170,8 @@ function NavBar() {
               >
                 {pages.map((page) => (
                   <MenuItem 
-                    component={Link} 
-                    href={`/${page.toLowerCase().replaceAll(' ', '-')}`}
+                    component={ReactRouterLink} 
+                    to={`/${page.toLowerCase().replaceAll(' ', '-')}`}
                     key={page} 
                     onClick={handleCloseNavMenu}
                   >
@@ -184,8 +185,8 @@ function NavBar() {
             <Typography
               variant="h5"
               noWrap
-              component="a"
-              href=""
+              component={ReactRouterLink}
+              to=""
               sx={{
                 mr: 2,
                 display: { xs: "flex", md: "none" },
@@ -227,8 +228,8 @@ function NavBar() {
               >
                 {settings.map((setting) => (
                   <MenuItem 
-                    component={Link} 
-                    href={`/${setting.toLowerCase().replaceAll(' ', '-')}`}
+                    component={ReactRouterLink} 
+                    to={`/${setting.toLowerCase().replaceAll(' ', '-')}`}
                     key={setting} 
                     onClick={handleCloseUserMenu}
                   >
