@@ -1,6 +1,13 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, forwardRef } from 'react';
 import GameBoardState from '../../helpers/GameBoardState';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
+import calcScore from '../../helpers/calcScore';
 import './Play.css';
 
 const wordDictionary = require('an-array-of-english-words');
@@ -8,6 +15,10 @@ const COLUMNS = 5;
 const ROWS = 4;
 const VISIBLE_NEXT_ROWS = 2;
 const EMPTY_SPACES_INITIAL_VALUE = [...Array(COLUMNS)].map(() => ([]));
+
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Slide direction="down" ref={ref} {...props} />;
+});
 
 function Play() {
   const [notStarted, setNotStarted] = useState(true);
@@ -22,10 +33,22 @@ function Play() {
   const [emptySpaces, setEmptySpaces] = useState(EMPTY_SPACES_INITIAL_VALUE);
   const [popCollapse, setPopCollapse] = useState(false);
   const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const timerIntervalId = useRef();
   const resultTimeoutId = useRef();
   const gameInstance = useRef();
+
+  const wordInputElement = useCallback((input) => {
+    if (input) {
+      input.focus();
+    }
+  }, []); 
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
 
   let timeDisplay;
   const primaryPath = new Set(paths[primaryPathIdx]);
@@ -39,6 +62,7 @@ function Play() {
     setGameInProgress(false);
     clearInterval(timerIntervalId.current);
     setTimer(null);
+    setDialogOpen(true);
   }
 
   if (gameInProgress) {
@@ -95,7 +119,6 @@ function Play() {
           setResultShowing(false);
         }, 1000);
         const emptySpaces = gameInstance.current.popBubbles([...primaryPath]);
-        console.log(emptySpaces);
         setEmptySpaces(emptySpaces);
         setTimeout(() => {
           setPopCollapse(true);
@@ -104,6 +127,7 @@ function Play() {
           setEmptySpaces(EMPTY_SPACES_INITIAL_VALUE);
           setPopCollapse(false);
         }, 1000);
+        setScore(calcScore(submittedWord, score));
       }
       else {
         setResult(`${submittedWord} not a word`);
@@ -130,7 +154,7 @@ function Play() {
 
   if (notStarted) {
     return (
-      <div className="Play">
+      <div className="Play Play-before-start">
         <Button
           onClick={handleStartGame}
           variant="contained"
@@ -146,8 +170,8 @@ function Play() {
 
   if (countdown) {
     return (
-      <div className="Play">
-        <p>{countdown}</p>
+      <div className="Play Play-before-start">
+        <div>{countdown}</div>
       </div>
     )
   }
@@ -155,7 +179,7 @@ function Play() {
   if (gameInProgress) {
     return (
       <div className="Play">
-        <p>Game in progress</p>
+        <p>Score: {score}</p>
         <p>Timer: {timeDisplay}</p>
         <div className="Play-game-board">
           {gameInstance.current.currentBoard.map((column, columnIdx) => {
@@ -216,7 +240,7 @@ function Play() {
           </div>
         </div> */}
         <form onSubmit={handleSubmit}>
-          <input type='text' onChange={handleChange} value={wordInput} />
+          <input type='text' onChange={handleChange} value={wordInput} ref={wordInputElement} />
           <button type='submit'>check</button>
         </form>
         <div className={resultShowing ? undefined : 'Play-result-hidden'}>{result}</div>
@@ -226,7 +250,66 @@ function Play() {
 
   if (gameFinished) {
     return (
-      <p>Game finished</p>
+      <div className="Play">
+        <p>Score: {score}</p>
+        <p>Timer: {timeDisplay}</p>
+        <div className="Play-game-board">
+          {gameInstance.current.currentBoard.map((column, columnIdx) => {
+            return (
+              <div key={columnIdx}>
+                {column.slice(0, ROWS).map((letter, rowIdx) => {
+                  return (
+                    <>
+                      {emptySpaces[columnIdx][rowIdx] && 
+                        [...Array(emptySpaces[columnIdx][rowIdx])].map((ignore, idx) => {
+                          return (
+                            <div 
+                              className={`
+                                Play-empty-bubble-space 
+                                ${popCollapse ? 'Play-collapse' : undefined}
+                              `} 
+                              key={`empty-${columnIdx}${rowIdx}${idx}`}
+                            ></div>
+                          )
+                        })
+                      }
+                      <div 
+                        className=
+                          {`
+                            Play-letter-bubble 
+                            ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
+                              secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
+                          `}
+                        key={`${columnIdx}${rowIdx}`}
+                      >
+                        {letter}
+                      </div>
+                    </>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
+        <Dialog
+          open={dialogOpen}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={handleDialogClose}
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle>{"Game Over!"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-slide-description">
+              Final Score: {score}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose}>Close</Button>
+            <Button component="button" href={"/play"}>Play Again</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
     )
   }
 }
