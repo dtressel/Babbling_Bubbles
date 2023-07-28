@@ -1,4 +1,12 @@
 /* 
+  This GameBoardState class keeps track of the state of the game board
+  and provides functions to alter the game board.
+
+  Used in /src/pages/Play/play.js
+
+  play.js creates an instance of this class and then stores the instance of
+  this class using useRef() to access that instance.
+
   Improvements to make:
     1. if deleting more than one character check for match starting with first character
     2. if adding more than one charcter check for subset already recorded
