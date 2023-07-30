@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import UserContext from "../../contexts/UserContext";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -15,6 +16,7 @@ import { Link as ReactRouterLink } from "react-router-dom";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const barLinks = ["Play", "Leaderboards"];
+const noUserLinks = ["Login", "Register"];
 const learnLinks = ["How To Play", "Strategies", "About"];
 const pages = ["Play", "Leaderboards", "How To Play", "Strategies", "About"];
 const settings = ["Stats", "Profile", "Logout"];
@@ -23,6 +25,8 @@ function NavBar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElLearn, setAnchorElLearn] = useState(null);
+
+  const { currentUser, logoutUser } = useContext(UserContext);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -200,45 +204,62 @@ function NavBar() {
             >
               Babbling Bubbles (small)
             </Typography>
-          
+              
             {/* User Icon */}
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open User Info">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                </IconButton>
-              </Tooltip>
+            {currentUser && 
+              <Box sx={{ flexGrow: 0 }}>
+                <Tooltip title="Open User Info">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  </IconButton>
+                </Tooltip>
 
-              {/* User Menu */}
-              <Menu
-                sx={{ mt: "45px" }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right"
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right"
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {settings.map((setting) => (
-                  <MenuItem 
-                    component={ReactRouterLink} 
-                    to={`/${setting.toLowerCase().replaceAll(' ', '-')}`}
-                    key={setting} 
-                    onClick={handleCloseUserMenu}
-                  >
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-        
+                {/* User Menu */}
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right"
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  {settings.map((setting) => (
+                    <MenuItem 
+                      component={ReactRouterLink} 
+                      to={`/${setting.toLowerCase().replaceAll(' ', '-')}`}
+                      key={setting} 
+                      onClick={handleCloseUserMenu}
+                    >
+                      <Typography textAlign="center">{setting}</Typography>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Box>
+            }
+
+            {!currentUser && 
+              <Box sx={{ flexGrow: 0 }}>
+              {noUserLinks.map((page) => (
+                <Button
+                  component={ReactRouterLink}
+                  to={`/${page.toLowerCase().replaceAll(' ', '-')}`}
+                  key={page}
+                  sx={{ my: 2, color: "white" }}
+                >
+                  {page}
+                </Button>
+              ))}
+              </Box>
+            }
+
           </Toolbar>
         </Container>
       </AppBar>
