@@ -10,6 +10,7 @@ const useCurrentUser = () => {
       const user = await ApiLink.getUser(currentUser.userId);
       setCurrentUser(user);
     }
+    // if there is user information from token but not yet full user info
     if (currentUser && !currentUser.email) {
       getUserInfo();
     } 
@@ -18,20 +19,33 @@ const useCurrentUser = () => {
   if (currentUser === undefined) {
     const savedUser = JSON.parse(localStorage.getItem("user"));
     if (savedUser) {
-      savedUser.applications = [];
       const { token, ...rest } = savedUser;
       setCurrentUser(rest);
       ApiLink.token = token;
     }
   }
 
+  /* 
+    signupInfo is an object
+      Must include: username,  email, password, confirmPassword
+      May include: firstName, lastName, country
+  */
   const signupUser = async (signupInfo) => {
     try {
-      const newToken = await ApiLink.signupUser(signupInfo);
-      ApiLink.token = newToken;
-      const user = await ApiLink.getUser(signupInfo.username);
-      setCurrentUser(user);
-      localStorage.setItem("user", JSON.stringify({ username: user.username, firstName: user.firstName, token: newToken }));
+      if (signupInfo.password !== signupInfo.confirmPassword) {
+        throw new Error('Passwords do not match!');
+      }
+      delete signupInfo.confirmPassword;
+      const userData = await ApiLink.signupUser(signupInfo);
+      ApiLink.token = userData.token;
+      setCurrentUser(userData.user);
+      localStorage.setItem("user", JSON.stringify(
+        {
+          userId: userData.user.id,
+          username: userData.user.username,
+          token: userData.token
+        }
+      ));
       return { successful: true };
     }
     catch(err) {
@@ -39,13 +53,22 @@ const useCurrentUser = () => {
     }
   }
 
+  /* 
+    loginInfo is an object
+      Must include: username, password
+  */
   const loginUser = async (loginInfo) => {
     try {
-      const newToken = await ApiLink.loginUser(loginInfo);
-      ApiLink.token = newToken;
-      const user = await ApiLink.getUser(loginInfo.username);
-      setCurrentUser(user);
-      localStorage.setItem("user", JSON.stringify({ username: user.username, firstName: user.firstName, token: newToken }));
+      const userData = await ApiLink.loginUser(loginInfo);
+      ApiLink.token = userData.token;
+      setCurrentUser(userData.user);
+      localStorage.setItem("user", JSON.stringify(
+        {
+          userId: userData.user.id,
+          username: userData.user.username,
+          token: userData.token
+        }
+      ));
       return { successful: true };
     }
     catch(err) {
@@ -53,46 +76,43 @@ const useCurrentUser = () => {
     }
   }
 
+  /* Method to log out user */
   const logoutUser = () => {
     ApiLink.token = null;
     setCurrentUser(null);
     localStorage.removeItem("user");
   }
 
-  const validatePassword = async (password) => {
+  /* 
+    updateInfo is an object:
+      Must include: currPassword
+      May include: email, firstName, lastName, country, newPassword 
+  */
+  const updateUserInfo = async (updateInfo) => {
     try {
-      await ApiLink.loginUser({ username: currentUser.username, password: password });
-      return true;
+      const updatedUser = await ApiLink.updateUserInfo(currentUser.id, updateInfo);
+      setCurrentUser(() => (updatedUser));
+      localStorage.setItem("user", JSON.stringify(
+        {
+          userId: updatedUser.id,
+          username: updatedUser.username,
+          token: ApiLink.token
+        }
+      ));
+      if (updateInfo.newPassword) {
+        return {updated: true, message: "Password successfully updated!"};
+      }
+      return {updated: true, message: "User profile successfully updated!"};
     }
     catch {
-      return false;
+      if (updateInfo.newPassword) {
+        return {updated: true, message: "Server error. Password no updated. Please try again later!"};
+      }
+      return {updated: false, message: "Server error. User profile not updated. Please try again later!"};
     }
   }
 
-  const updateUser = async (updateInfo) => {
-    try {
-      const updatedUser = await ApiLink.updateUser(currentUser.username, updateInfo);
-      setCurrentUser(() => ({ ...updatedUser, applications: currentUser.applications }));
-      localStorage.setItem("user", JSON.stringify({ username: updatedUser.username, firstName: updateInfo.firstName, token: ApiLink.token }));
-      return {updated: true, message: "User profile successfully updated!"}
-    }
-    catch {
-      return {updated: false, message: "Server error. User profile not updated. Please try again later!"}
-    }
-  }
-
-  const addApplication = async (jobId) => {
-    try {
-      await ApiLink.applyJob(currentUser.username, jobId);
-      setCurrentUser(() => ({...currentUser, applications: [...currentUser.applications, jobId]}));
-      return true;
-    }
-    catch {
-      return false;
-    }
-  }
-
-  return [currentUser, signupUser, loginUser, logoutUser, validatePassword, updateUser, addApplication];
+  return { currentUser, signupUser, loginUser, logoutUser, updateUserInfo };
 }
 
 export default useCurrentUser;
