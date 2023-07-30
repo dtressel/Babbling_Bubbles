@@ -38,22 +38,18 @@ class ApiLink {
   /* Register user */
     static async signupUser(signupInfo) {
       const data = await this.request(`auth/register`, signupInfo, "post");
-      return data.token;
-      // const res = await axios.post(`${BASE_URL}/auth/register`, signupInfo);
-      // return res.data.token;
+      return data;
     }
   
   /* Login user */
     static async loginUser(loginInfo) {
-      const data = await this.request(`auth/token`, loginInfo, "post");
-      return data.token;
-      // const res = await axios.post(`${BASE_URL}/auth/token`, loginInfo);
-      // return res.data.token;
+      const data = await this.request(`auth/login`, loginInfo, "post");
+      return data;
     }
 
   /* Get details on a user by user id */
-  static async getUser(user_id) {
-    const data = await this.request(`users/${user_id}`);
+  static async getUser(userId) {
+    const data = await this.request(`users/${userId}`);
     return data.user;
   }
 
@@ -63,9 +59,19 @@ class ApiLink {
     return data.user;
   }
 
+  /* Update information for a particular user */
+  static async updateUserInfo(userId, updateInfo) {
+    const data = await this.request(`users/${userId}`, updateInfo, "patch");
+    return data.user;
+  }
 
 
 
+
+
+
+
+  
 
   /* Get list of all companies */
   static async getCompanies(params) {
@@ -87,17 +93,6 @@ class ApiLink {
   static async getCompany(handle) {
     const data = await this.request(`companies/${handle}`);
     return data.company;
-  }
-
-  /* Update information for a particular user */
-  static async updateUser(username, updateInfo) {
-    const data = await this.request(`users/${username}`, updateInfo, "patch");
-    return data.user;
-  }
-
-  /* Applies to a job */
-  static async applyJob(username, jobId) {
-    await this.request(`users/${username}/jobs/${jobId}`, {}, "post");
   }
 }
 
