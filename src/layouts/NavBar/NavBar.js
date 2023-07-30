@@ -19,7 +19,7 @@ const barLinks = ["Play", "Leaderboards"];
 const noUserLinks = ["Login", "Register"];
 const learnLinks = ["How To Play", "Strategies", "About"];
 const pages = ["Play", "Leaderboards", "How To Play", "Strategies", "About"];
-const settings = ["Stats", "Profile", "Logout"];
+const settings = ["Stats", "Profile"];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -241,23 +241,71 @@ function NavBar() {
                       <Typography textAlign="center">{setting}</Typography>
                     </MenuItem>
                   ))}
+                  <MenuItem 
+                    component={ReactRouterLink} 
+                    to={'/logout'}
+                    key='Logout'
+                    onClick={logoutUser}
+                  >
+                    <Typography textAlign="center">Logout</Typography>
+                </MenuItem>
                 </Menu>
               </Box>
             }
 
             {!currentUser && 
-              <Box sx={{ flexGrow: 0 }}>
-              {noUserLinks.map((page) => (
-                <Button
-                  component={ReactRouterLink}
-                  to={`/${page.toLowerCase().replaceAll(' ', '-')}`}
-                  key={page}
-                  sx={{ my: 2, color: "white" }}
-                >
-                  {page}
-                </Button>
-              ))}
-              </Box>
+              <>
+                {/* Login/Register buttons in desktop mode */}
+                <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' }}}>
+                {noUserLinks.map((page) => (
+                  <Button
+                    component={ReactRouterLink}
+                    to={`/${page.toLowerCase().replaceAll(' ', '-')}`}
+                    key={page}
+                    sx={{ my: 2, color: "white" }}
+                  >
+                    {page}
+                  </Button>
+                ))}
+                </Box>
+
+                <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
+                  <Tooltip title="Open User Info">
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                    </IconButton>
+                  </Tooltip>
+
+                  {/* User Menu with login/register in mobile mode */}
+                  <Menu
+                    sx={{ mt: "45px" }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right"
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right"
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    {noUserLinks.map((link) => (
+                      <MenuItem 
+                        component={ReactRouterLink} 
+                        to={`/${link.toLowerCase().replaceAll(' ', '-')}`}
+                        key={link} 
+                        onClick={handleCloseUserMenu}
+                      >
+                        <Typography textAlign="center">{link}</Typography>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+              </>
             }
 
           </Toolbar>
