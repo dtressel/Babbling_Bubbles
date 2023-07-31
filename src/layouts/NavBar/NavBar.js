@@ -50,6 +50,11 @@ function NavBar() {
     setAnchorElLearn(null);
   };
 
+  const handleLogout = () => {
+    setAnchorElUser(null);
+    logoutUser();
+  }
+
   return (
     // Div to contain whole app bar
     <Box sx={{display: "flex", justifyContent: "center" }}>
@@ -243,9 +248,9 @@ function NavBar() {
                   ))}
                   <MenuItem 
                     component={ReactRouterLink} 
-                    to={'/logout'}
+                    to='/'
                     key='Logout'
-                    onClick={logoutUser}
+                    onClick={handleLogout}
                   >
                     <Typography textAlign="center">Logout</Typography>
                 </MenuItem>
