@@ -33,12 +33,13 @@
   justify-content: center;
 }
 
-.Play-letter-bubble{
+.Play-letter-bubble {
   height: 3rem;
   margin: 0 0.4rem 0.6rem;
   border: 1px solid gray;
   border-radius: 50%;
   font-size: 1.5rem;
+  user-select: none;
 }
 
 .Play-empty-bubble-space {
