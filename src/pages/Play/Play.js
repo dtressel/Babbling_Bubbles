@@ -271,44 +271,12 @@ function Play() {
       <div className="Play">
         <p>Score: {score}</p>
         <p>Timer: {timeDisplay}</p>
-        <div className="Play-game-board">
-          {gameInstanceRef.current.currentBoard.map((column, columnIdx) => {
-            return (
-              <div key={columnIdx}>
-                {column.slice(0, ROWS).map((letter, rowIdx) => {
-                  return (
-                    <>
-                      {emptySpaces[columnIdx][rowIdx] && 
-                        [...Array(emptySpaces[columnIdx][rowIdx])].map((ignore, idx) => {
-                          return (
-                            <div 
-                              className={`
-                                Play-empty-bubble-space 
-                                ${popCollapse ? 'Play-collapse' : undefined}
-                              `} 
-                              key={`empty-${columnIdx}${rowIdx}${idx}`}
-                            ></div>
-                          )
-                        })
-                      }
-                      <div 
-                        className=
-                          {`
-                            Play-letter-bubble 
-                            ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
-                              secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
-                          `}
-                        key={`${columnIdx}${rowIdx}`}
-                      >
-                        {letter}
-                      </div>
-                    </>
-                  )
-                })}
-              </div>
-            )
-          })}
-        </div>
+        <GameBoard
+          gameInstance={gameInstanceRef.current}
+          primaryPath={primaryPath}
+          secondaryPaths={secondaryPaths}
+          emptySpaces={emptySpaces}
+        />
         <Dialog
           open={dialogOpen}
           TransitionComponent={Transition}
