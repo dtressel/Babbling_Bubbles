@@ -1,3 +1,11 @@
+/* 
+  Improvements to be made:
+    1. When clicking on letters, work out primary path index so that the clicked path is the primary path
+    2. make change path button
+    3. make backspace button
+    4. make it so that when pressing spacebar anywhere, add space to input to trigger path change
+*/
+
 import { useState, useRef, useCallback, forwardRef } from 'react';
 import GameBoardState from '../../helpers/GameBoardState';
 import Button from '@mui/material/Button';
@@ -85,23 +93,39 @@ function Play() {
     gameInstance.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
   }
 
+  // handle change to word input
   const handleChange = (evt) => {
-    let str = evt.target.value;
+    processNewInput(evt.target.value);
+  }
+
+  const handleBubbleClick = (evt) => {
+    processNewInput(wordInput + evt.target.textContent.toLowerCase());
+  }
+
+  const processNewInput = (str) => {
+    // ignore if word input length is greater than number of letters in game board
+    // This stops GameBoardState from keeping track of word in needless scenarios
     if (str.length > COLUMNS * ROWS) return;
+    // if user typed a space change the primary path index and do not add space to input
     if (str[str.length - 1] === ' ') {
       str = str.slice(0, -1);
       setPrimaryPathIdx((primaryPathIdx) => (
         (primaryPathIdx >= paths.length - 1) ? 0 : primaryPathIdx + 1
       ));
     }
+    // Otherwise, if user didn't type a space
     else {
+      // show change in input
       setWordInput(str);
+      // if primary path index was changed, record that change in GameBoardState
       if (gameInstance.current.savedPaths.length 
         && gameInstance.current.savedPaths.slice(-1)[0].paths.length
         && gameInstance.current.savedPaths.slice(-1)[0].paths[primaryPathIdx].flag !== 0) {
         gameInstance.current.setPrimaryPathIdx(primaryPathIdx);
       }
+      // call findPaths in GameBoardState to create new paths
       const pathsObj = gameInstance.current.findPaths(str.toUpperCase());
+      // set paths and primary path index here in Play.js
       setPaths(pathsObj.paths);
       setPrimaryPathIdx(pathsObj.primaryPathIdx);
     }
@@ -111,7 +135,15 @@ function Play() {
     evt.preventDefault();
     const submittedWord = wordInput.toLowerCase();
     if (paths.length) {
-      if (wordDictionary.includes(submittedWord)) {
+      if (submittedWord.length < 3) {
+        setResult(`word must contain at least 3 letters`);
+        setResultShowing(true);
+        clearTimeout(resultTimeoutId.current);
+        resultTimeoutId.current = setTimeout(() => {
+          setResultShowing(false);
+        }, 1000);
+      }
+      else if (wordDictionary.includes(submittedWord)) {
         setResult(`${submittedWord} found!`);
         setResultShowing(true);
         clearTimeout(resultTimeoutId.current);
@@ -209,6 +241,7 @@ function Play() {
                               secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
                           `}
                         key={`${columnIdx}${rowIdx}`}
+                        onClick={handleBubbleClick}
                       >
                         {letter}
                       </div>
