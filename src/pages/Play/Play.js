@@ -7,6 +7,7 @@
 */
 
 import { useState, useRef, useCallback, forwardRef } from 'react';
+import GameBoard from './GameBoard';
 import GameBoardState from '../../helpers/GameBoardState';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -46,7 +47,7 @@ function Play() {
 
   const timerIntervalId = useRef();
   const resultTimeoutId = useRef();
-  const gameInstance = useRef();
+  const gameInstanceRef = useRef();
 
   const wordInputElement = useCallback((input) => {
     if (input) {
@@ -69,7 +70,7 @@ function Play() {
         setTimer((timer) => timer - 1);
       }, 1000);
     }, 3000);
-    gameInstance.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
+    gameInstanceRef.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
   }
 
   const handleGameEnd = () => {
@@ -122,13 +123,13 @@ function Play() {
       // show change in input
       setWordInput(str);
       // if primary path index was changed, record that change in GameBoardState
-      if (gameInstance.current.savedPaths.length 
-        && gameInstance.current.savedPaths.slice(-1)[0].paths.length
-        && gameInstance.current.savedPaths.slice(-1)[0].paths[primaryPathIdx].flag !== 0) {
-        gameInstance.current.setPrimaryPathIdx(primaryPathIdx);
+      if (gameInstanceRef.current.savedPaths.length 
+        && gameInstanceRef.current.savedPaths.slice(-1)[0].paths.length
+        && gameInstanceRef.current.savedPaths.slice(-1)[0].paths[primaryPathIdx].flag !== 0) {
+        gameInstanceRef.current.setPrimaryPathIdx(primaryPathIdx);
       }
       // call findPaths in GameBoardState to create new paths
-      const pathsObj = gameInstance.current.findPaths(str.toUpperCase());
+      const pathsObj = gameInstanceRef.current.findPaths(str.toUpperCase());
       // set paths and primary path index here in Play.js
       setPaths(pathsObj.paths);
       setPrimaryPathIdx(pathsObj.primaryPathIdx);
@@ -159,7 +160,7 @@ function Play() {
           setResultShowing(false);
         }, 1000);
         // get empty spaces array of arrays by submitting primary path
-        const emptySpaces = gameInstance.current.popBubbles([...primaryPath]);
+        const emptySpaces = gameInstanceRef.current.popBubbles([...primaryPath]);
         setEmptySpaces(emptySpaces);
         // start animation, pop collapse shrinks empty spaces to zero
         setTimeout(() => {
@@ -195,7 +196,7 @@ function Play() {
     setWordInput('');
     setPaths([]);
     setPrimaryPathIdx(0);
-    gameInstance.current.savedPaths = [];
+    gameInstanceRef.current.savedPaths = [];
   }
 
   if (notStarted) {
@@ -227,51 +228,17 @@ function Play() {
       <div className="Play">
         <p>Score: {score}</p>
         <p>Timer: {timeDisplay}</p>
-        <div className="Play-game-board">
-          {/* for each column on game board */}
-          {gameInstance.current.currentBoard.map((column, columnIdx) => {
-            return (
-              <div key={`column-${columnIdx}`}>
-                {/* for each bubble in column */}
-                {column.slice(0, ROWS).map((letter, rowIdx) => {
-                  return (
-                    <div key={`${columnIdx}${rowIdx}`}>
-                      {/* Empty space(s) if they exist before this bubble */}
-                      {emptySpaces[columnIdx][rowIdx] && 
-                        [...Array(emptySpaces[columnIdx][rowIdx])].map((ignore, idx) => {
-                          return (
-                            <div 
-                              className={`
-                                Play-empty-bubble-space 
-                                ${popCollapse ? 'Play-collapse' : undefined}
-                              `} 
-                              key={`empty-${columnIdx}${rowIdx}${idx}`}
-                            ></div>
-                          )
-                        })
-                      }
-                      {/* Bubble (letter, */}
-                      <div 
-                        className=
-                          {`
-                            Play-letter-bubble 
-                            ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
-                              secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
-                          `}
-                        onClick={handleBubbleClick}
-                      >
-                        {letter}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )
-          })}
-        </div>
+        <GameBoard
+          gameInstance={gameInstanceRef.current}
+          primaryPath={primaryPath}
+          secondaryPaths={secondaryPaths}
+          handleBubbleClick={handleBubbleClick}
+          emptySpaces={emptySpaces}
+          popCollapse={popCollapse}
+        />
         {/* <div className='Play-extra-bubbles'>
           <div>
-            {gameInstance.current.currentBoard.map((column, columnIdx) => {
+            {gameInstanceRef.current.currentBoard.map((column, columnIdx) => {
               return (
                 <div key={columnIdx}>
                   {column.slice(ROWS, ROWS + VISIBLE_NEXT_ROWS).map((letter, rowIdx) => {
@@ -305,7 +272,7 @@ function Play() {
         <p>Score: {score}</p>
         <p>Timer: {timeDisplay}</p>
         <div className="Play-game-board">
-          {gameInstance.current.currentBoard.map((column, columnIdx) => {
+          {gameInstanceRef.current.currentBoard.map((column, columnIdx) => {
             return (
               <div key={columnIdx}>
                 {column.slice(0, ROWS).map((letter, rowIdx) => {
