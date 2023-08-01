@@ -35,7 +35,7 @@ function Play() {
   const [countdown, setCountdown] = useState(3);
   const [timer, setTimer] = useState(180);
   const [wordInput, setWordInput] = useState('');
-  const [result, setResult] = useState('');
+  const [result, setResult] = useState('placeholder for div height');
   const [resultShowing, setResultShowing] = useState(false);
   const [paths, setPaths] = useState([]);
   const [emptySpaces, setEmptySpaces] = useState(EMPTY_SPACES_INITIAL_VALUE);
@@ -58,27 +58,6 @@ function Play() {
     setDialogOpen(false);
   };
 
-  let timeDisplay;
-  const primaryPath = new Set(paths[primaryPathIdx]);
-  const secondaryPaths = new Set([
-    ...paths.slice(0, primaryPathIdx),
-    ...paths.slice(primaryPathIdx + 1)
-  ].flat());
-
-  if (timer === 0) {
-    setGameFinished(true);
-    setGameInProgress(false);
-    clearInterval(timerIntervalId.current);
-    setTimer(null);
-    setDialogOpen(true);
-  }
-
-  if (gameInProgress) {
-    const minutes = Math.floor(timer / 60);
-    const seconds = timer % 60;
-    timeDisplay = `${minutes}:${seconds >= 10 ? seconds : '0' + seconds}`;
-  }
-
   const handleStartGame = () => {
     setNotStarted(false);
     setTimeout(() => setCountdown(2), 1000);
@@ -91,6 +70,31 @@ function Play() {
       }, 1000);
     }, 3000);
     gameInstance.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
+  }
+
+  const handleGameEnd = () => {
+    setGameFinished(true);
+    setGameInProgress(false);
+    clearInterval(timerIntervalId.current);
+    setTimer(null);
+    setDialogOpen(true);
+  }
+
+  let timeDisplay;
+  const primaryPath = new Set(paths[primaryPathIdx]);
+  const secondaryPaths = new Set([
+    ...paths.slice(0, primaryPathIdx),
+    ...paths.slice(primaryPathIdx + 1)
+  ].flat());
+
+  if (timer === 0) {
+    handleGameEnd();
+  }
+
+  if (gameInProgress) {
+    const minutes = Math.floor(timer / 60);
+    const seconds = timer % 60;
+    timeDisplay = `${minutes}:${seconds >= 10 ? seconds : '0' + seconds}`;
   }
 
   // handle change to word input
@@ -131,10 +135,13 @@ function Play() {
     }
   }
   
+  // handle word submit
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const submittedWord = wordInput.toLowerCase();
+    // if paths exist then submitted word is on board so continue
     if (paths.length) {
+      // if submitted word is less than 3 letters, display message and ignore submission
       if (submittedWord.length < 3) {
         setResult(`word must contain at least 3 letters`);
         setResultShowing(true);
@@ -143,6 +150,7 @@ function Play() {
           setResultShowing(false);
         }, 1000);
       }
+      // if word is long enough and found in dictionary, display message and accept submission
       else if (wordDictionary.includes(submittedWord)) {
         setResult(`${submittedWord} found!`);
         setResultShowing(true);
@@ -150,17 +158,21 @@ function Play() {
         resultTimeoutId.current = setTimeout(() => {
           setResultShowing(false);
         }, 1000);
+        // get empty spaces array of arrays by submitting primary path
         const emptySpaces = gameInstance.current.popBubbles([...primaryPath]);
         setEmptySpaces(emptySpaces);
+        // start animation, pop collapse shrinks empty spaces to zero
         setTimeout(() => {
           setPopCollapse(true);
         }, 200);
+        // end animation, clear empty spaces and set popCollapse to false to be ready for next pop
         setTimeout(() => {
           setEmptySpaces(EMPTY_SPACES_INITIAL_VALUE);
           setPopCollapse(false);
         }, 1000);
         setScore(calcScore(submittedWord, score));
       }
+      // if submitted word is not found in dictionary, display message and ignore submission
       else {
         setResult(`${submittedWord} not a word`);
         setResultShowing(true);
@@ -170,6 +182,7 @@ function Play() {
         }, 1000);
       }
     }
+    // if paths don't exist, then word not found on board, display message and ignore submission
     else {
       setResult(`${submittedWord} not on board`);
       setResultShowing(true);
@@ -178,6 +191,7 @@ function Play() {
         setResultShowing(false);
       }, 1000);
     }
+    // reset everything to be ready for a new word and new paths
     setWordInput('');
     setPaths([]);
     setPrimaryPathIdx(0);
@@ -214,12 +228,15 @@ function Play() {
         <p>Score: {score}</p>
         <p>Timer: {timeDisplay}</p>
         <div className="Play-game-board">
+          {/* for each column on game board */}
           {gameInstance.current.currentBoard.map((column, columnIdx) => {
             return (
-              <div key={columnIdx}>
+              <div key={`column-${columnIdx}`}>
+                {/* for each bubble in column */}
                 {column.slice(0, ROWS).map((letter, rowIdx) => {
                   return (
-                    <>
+                    <div key={`${columnIdx}${rowIdx}`}>
+                      {/* Empty space(s) if they exist before this bubble */}
                       {emptySpaces[columnIdx][rowIdx] && 
                         [...Array(emptySpaces[columnIdx][rowIdx])].map((ignore, idx) => {
                           return (
@@ -233,6 +250,7 @@ function Play() {
                           )
                         })
                       }
+                      {/* Bubble (letter, */}
                       <div 
                         className=
                           {`
@@ -240,12 +258,11 @@ function Play() {
                             ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
                               secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
                           `}
-                        key={`${columnIdx}${rowIdx}`}
                         onClick={handleBubbleClick}
                       >
                         {letter}
                       </div>
-                    </>
+                    </div>
                   )
                 })}
               </div>
@@ -277,6 +294,7 @@ function Play() {
           <button type='submit'>check</button>
         </form>
         <div className={resultShowing ? undefined : 'Play-result-hidden'}>{result}</div>
+        <Button onClick={handleGameEnd}>End Game</Button>
       </div>
     )
   }
