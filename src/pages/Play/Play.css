@@ -42,6 +42,16 @@
   user-select: none;
 }
 
+.Play-double-bubble {
+  border: 1px solid rgb(255, 179, 125);
+  outline: 1px solid rgb(255, 179, 125);
+}
+
+.Play-triple-bubble {
+  border: 1px solid gold;
+  outline: 3px solid gold;
+}
+
 .Play-empty-bubble-space {
   margin: 0 0.4rem;
   transition: height 800ms;

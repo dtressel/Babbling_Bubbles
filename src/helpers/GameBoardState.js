@@ -254,7 +254,7 @@ class GameBoardState {
     const paths = [];
     for (let i = 0; i < this.columns; i++) {
       for (let j = 0; j < this.rows; j++) {
-        if (letter === this.currentBoard[i][j]) {
+        if (letter === this.currentBoard[i][j][0]) {
           
           if (!paths.length) {
             paths.push({ path: [`${i}${j}`], flag: 0 });
@@ -307,7 +307,7 @@ class GameBoardState {
       let endRow = (currRow + 1 < this.rows) ? currRow + 1 : currRow;
       for (let testRow = startRow; testRow <= endRow; testRow++) {
         // if you the letter we're looking for is found at this test bubble
-        if (this.currentBoard[testColumn][testRow] === letter) {
+        if (this.currentBoard[testColumn][testRow][0] === letter) {
           // if this bubble has not already been used in this path
           if (!oldPath.path.includes(`${testColumn}${testRow}`)) {
             const foundPath = 
@@ -385,7 +385,19 @@ class GameBoardState {
   static chooseLetters(numOfLetters) {
     const letters = [];
     for (let i = 0; i < numOfLetters; i++) {
-      letters.push(GameBoardState.letterArray[Math.floor(Math.random() * 100)]);
+      const multiplierChooserNum = Math.floor(Math.random() * 60);
+      const letter = this.letterArray[Math.floor(Math.random() * 100)];
+      // if less than 1, triple chosen letter for 3x multiplier (1/60 chance)
+      if (multiplierChooserNum < 1) {
+        letters.push(letter + letter + letter);
+      }
+      // if greater than 94, double chosen letter for 2x multiplier (1/30 chance)
+      else if (multiplierChooserNum > 57) {
+        letters.push(letter + letter);
+      }
+      else {
+        letters.push(letter);
+      }
     }
     return letters;
   }

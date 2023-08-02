@@ -159,6 +159,7 @@ function Play() {
         resultTimeoutId.current = setTimeout(() => {
           setResultShowing(false);
         }, 1000);
+        setScore(calcScore(submittedWord, primaryPath, gameInstanceRef.current, score));
         // get empty spaces array of arrays by submitting primary path
         const emptySpaces = gameInstanceRef.current.popBubbles([...primaryPath]);
         setEmptySpaces(emptySpaces);
@@ -171,7 +172,6 @@ function Play() {
           setEmptySpaces(EMPTY_SPACES_INITIAL_VALUE);
           setPopCollapse(false);
         }, 1000);
-        setScore(calcScore(submittedWord, score));
       }
       // if submitted word is not found in dictionary, display message and ignore submission
       else {

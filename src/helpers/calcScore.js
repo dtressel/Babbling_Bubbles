@@ -6,11 +6,20 @@ const numOfLettersBonus = { 3: 0, 4: 1, 5: 2, 6: 3, 7: 5, 8: 7, 9: 10, 10: 13,
                             11: 16, 12: 20, 13: 24, 14: 29, 15: 34, 16: 39,
                             17: 45, 18: 50, 19: 55, 20: 60 };
 
-function calcScore(word, currScore) {
+function calcScore(word, primaryPath, gameInstance, currScore) {
+  let wordScore = 0;
   for (const char of word) {
-    currScore += letterValues[char];
+    wordScore += letterValues[char];
   }
-  currScore += numOfLettersBonus[word.length];
+  wordScore += numOfLettersBonus[word.length];
+  let multiplier = 1;
+  for (const bubble of primaryPath) {
+    multiplier *= gameInstance.currentBoard[bubble[0]][bubble[1]].length;
+  }
+  wordScore *= multiplier;
+
+  currScore += wordScore;
+
   return currScore;
 }
 

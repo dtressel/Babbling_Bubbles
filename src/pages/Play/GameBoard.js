@@ -28,12 +28,14 @@ const GameBoard = ({ gameInstance, primaryPath, secondaryPaths, handleBubbleClic
                     className=
                       {`
                         Play-letter-bubble 
+                        ${letter.length === 3 ? 'Play-triple-bubble' : ''}
+                        ${letter.length === 2 ? 'Play-double-bubble' : ''} 
                         ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
                           secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
                       `}
                     onClick={handleBubbleClick}
                   >
-                    {letter}
+                    {letter[0]}
                   </div>
                 </div>
               )
