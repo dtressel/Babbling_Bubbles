@@ -67,6 +67,12 @@ class GameBoardState {
       flag values: 0: primary, 1: secondary, 2: relevant duplicates
     */
     this.savedPaths = [];
+    // To be set on game end
+    this.avgWordScore = null;
+    this.curr100Wma = null;
+    this.curr10Wma = null;
+    this.isPeak100Wma = null;
+    this.isPeak10Wma = null;
   }
   
   // creates an array of arrays, each inner array represents a column on the game board
@@ -511,8 +517,39 @@ class GameBoardState {
       if (letter.length > 1) boardStateString += (letter.length);
     }
 
-    console.log(boardStateString);
     return boardStateString;
+  }
+
+  /* Collects stats to send to API */
+  getStatsOnGameEnd() {
+    const statsForSend = {
+      baseInfo: {
+        score: this.score,
+        numOfWords: this.numOfWords,
+        bestWord: this.bestWord,
+        bestWordScore: this.bestWordScore,
+        bestWordBoardState: this.bestWordBoardState
+      },
+      extraStats: {
+        craziestWord: this.craziestWord,
+        craziestWordScore: this.craziestWordScore,
+        craziestWordBoardState: this.bestWordBoardState,
+        longestWord: this.longestWord,
+        longestWordScore: this.longestWordScore,
+        longestWordBoardState: this.longestWordBoardState
+      }
+    }
+
+    return statsForSend;
+  }
+
+  /* Sets the stats collected from backend on game over to game instance */
+  setGameOverStats(returnedStats) {
+    this.avgWordScore = returnedStats.avgWordScore;
+    this.curr100Wma = returnedStats.curr100Wma;
+    this.curr10Wma = returnedStats.curr10Wma;
+    this.isPeak100Wma = returnedStats.isPeak100Wma;
+    this.isPeak10Wma = returnedStats.isPeak10Wma;
   }
 
   static letterValues = { a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1,

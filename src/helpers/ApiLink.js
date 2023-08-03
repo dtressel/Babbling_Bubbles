@@ -65,35 +65,22 @@ class ApiLink {
     return data.user;
   }
 
+  /* 
+    Create new play at user start of single game 
+    newPlayData: { userId, gameType(optional), gameId(optional) }
+  */
+  static async newPlayAtUserStart(newPlayData) {
+    console.log(newPlayData);
+    const data = await this.request(`plays`, newPlayData, "post");
+    return data.playId;
+  }
 
-
-
-
-
-
+  /* Update data for finished play */
+  static async updatePlayAtGameOver(playId, updateInfo) {
+    const data = await this.request(`plays/${playId}`, updateInfo, "patch");
+    return data.stats;
+  }
   
-
-  /* Get list of all companies */
-  static async getCompanies(params) {
-    const data = await this.request(`companies`, params);
-    return data;
-    // const res = await axios.get(`${BASE_URL}/companies`, { params: params });
-    // return res.data;
-  }
-
-  /* Get list of all jobs */
-  static async getJobs(params) {
-    const data = await this.request(`jobs`, params);
-    return data;
-    // const res = await axios.get(`${BASE_URL}/jobs`, { params: params });
-    // return res.data;
-  }
-
-  /* Get details on a company by handle. */
-  static async getCompany(handle) {
-    const data = await this.request(`companies/${handle}`);
-    return data.company;
-  }
 }
 
 // for now, put token ("testuser" / "password" on class)

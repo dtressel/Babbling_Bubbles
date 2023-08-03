@@ -9,7 +9,9 @@
     1. Can we get rid of paths state and just reference GameBoardState instead when needed?
 */
 
-import { useState, useRef, useCallback, forwardRef } from 'react';
+import { useState, useRef, useCallback, forwardRef, useContext } from 'react';
+import UserContext from "../../contexts/UserContext";
+import ApiLink from '../../helpers/ApiLink';
 import GameBoard from './GameBoard';
 import GameBoardState from '../../helpers/GameBoardState';
 import Button from '@mui/material/Button';
@@ -49,9 +51,12 @@ function Play() {
   const [score, setScore] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const { currentUser } = useContext(UserContext);
+
   const timerIntervalId = useRef();
   const resultTimeoutId = useRef();
   const gameInstanceRef = useRef();
+  const playId = useRef();
 
   const wordInputElement = useCallback((input) => {
     if (input) {
@@ -67,23 +72,27 @@ function Play() {
     setNotStarted(false);
     setTimeout(() => setCountdown(2), 1000);
     setTimeout(() => setCountdown(1), 2000);
-    setTimeout(() => {
+    setTimeout(async () => {
       setCountdown(0);
       setGameInProgress(true);
       timerIntervalId.current = setInterval(() => {
         setTimer((timer) => timer - 1);
       }, 1000);
+      gameInstanceRef.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
+      console.log(currentUser);
+      playId.current = await ApiLink.newPlayAtUserStart({ userId: currentUser.userId });
     }, 3000);
-    gameInstanceRef.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
   }
 
-  const handleGameEnd = () => {
+  const handleGameEnd = async () => {
     setGameFinished(true);
     setGameInProgress(false);
     clearInterval(timerIntervalId.current);
     setTimer(null);
     // send update to database
-    console.log(gameInstanceRef.current);
+    const updateInfo = gameInstanceRef.current.getStatsOnGameEnd();
+    const returnedStats = await ApiLink.updatePlayAtGameOver(playId.current, updateInfo);
+    gameInstanceRef.current.setGameOverStats(returnedStats);
     setDialogOpen(true);
   }
 
@@ -301,7 +310,14 @@ function Play() {
           <DialogTitle>{"Game Over!"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-slide-description">
-              Final Score: {score}
+              <div>Final Score: {score}</div>
+              <div># of Words Found: {gameInstanceRef.current.numOfWords}</div>
+              <div>Average Word Score: {gameInstanceRef.current.avgWordScore}</div>
+              <div>Best Word Found: {gameInstanceRef.current.bestWord}</div>
+              <div>Best Word Score: {gameInstanceRef.current.bestWordScore}</div>
+              <div>Longest Word Found: {gameInstanceRef.current.longestWord}</div>
+              <div>Current 10 WMA: {gameInstanceRef.current.curr10Wma}</div>
+              <div>Current 100 WMA: {gameInstanceRef.current.curr100Wma}</div>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
