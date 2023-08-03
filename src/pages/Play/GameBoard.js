@@ -30,8 +30,8 @@ const GameBoard = ({ gameInstance, primaryPath, secondaryPaths, handleBubbleClic
                         Play-letter-bubble 
                         ${letter.length === 3 ? 'Play-triple-bubble' : ''}
                         ${letter.length === 2 ? 'Play-double-bubble' : ''} 
-                        ${primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' : (
-                          secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
+                        ${primaryPath && primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' :
+                          (secondaryPaths && secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
                       `}
                     onClick={handleBubbleClick}
                   >

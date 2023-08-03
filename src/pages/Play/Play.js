@@ -4,6 +4,9 @@
     2. make change path button
     3. make backspace button
     4. make it so that when pressing spacebar anywhere, add space to input to trigger path change
+
+  State management:
+    1. Can we get rid of paths state and just reference GameBoardState instead when needed?
 */
 
 import { useState, useRef, useCallback, forwardRef } from 'react';
@@ -16,7 +19,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
-import calcScore from '../../helpers/calcScore';
 import './Play.css';
 
 const wordDictionary = require('an-array-of-english-words');
@@ -39,9 +41,11 @@ function Play() {
   const [result, setResult] = useState('placeholder for div height');
   const [resultShowing, setResultShowing] = useState(false);
   const [paths, setPaths] = useState([]);
+  const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
+  const [primaryPath, setPrimaryPath] = useState();
+  const [secondaryPaths, setSecondaryPaths] = useState();
   const [emptySpaces, setEmptySpaces] = useState(EMPTY_SPACES_INITIAL_VALUE);
   const [popCollapse, setPopCollapse] = useState(false);
-  const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -78,15 +82,12 @@ function Play() {
     setGameInProgress(false);
     clearInterval(timerIntervalId.current);
     setTimer(null);
+    // send update to database
+    console.log(gameInstanceRef.current);
     setDialogOpen(true);
   }
 
   let timeDisplay;
-  const primaryPath = new Set(paths[primaryPathIdx]);
-  const secondaryPaths = new Set([
-    ...paths.slice(0, primaryPathIdx),
-    ...paths.slice(primaryPathIdx + 1)
-  ].flat());
 
   if (timer === 0) {
     handleGameEnd();
@@ -114,9 +115,13 @@ function Play() {
     // if user typed a space change the primary path index and do not add space to input
     if (str[str.length - 1] === ' ') {
       str = str.slice(0, -1);
-      setPrimaryPathIdx((primaryPathIdx) => (
-        (primaryPathIdx >= paths.length - 1) ? 0 : primaryPathIdx + 1
-      ));
+      const newPrimaryPathIndex = (primaryPathIdx >= paths.length - 1) ? 0 : primaryPathIdx + 1;
+      setPrimaryPathIdx(newPrimaryPathIndex);
+      setPrimaryPath(new Set(paths[newPrimaryPathIndex]));
+      setSecondaryPaths(new Set([
+        ...paths.slice(0, newPrimaryPathIndex),
+        ...paths.slice(newPrimaryPathIndex + 1)
+      ].flat()));
     }
     // Otherwise, if user didn't type a space
     else {
@@ -130,9 +135,16 @@ function Play() {
       }
       // call findPaths in GameBoardState to create new paths
       const pathsObj = gameInstanceRef.current.findPaths(str.toUpperCase());
+      // set currWordScore
+      // const currWordScore = gameInstanceRef.current.calcCurrWordScore(str, primaryPath);
       // set paths and primary path index here in Play.js
       setPaths(pathsObj.paths);
       setPrimaryPathIdx(pathsObj.primaryPathIdx);
+      setPrimaryPath(new Set(pathsObj.paths[pathsObj.primaryPathIdx]));
+      setSecondaryPaths(new Set([
+        ...pathsObj.paths.slice(0, pathsObj.primaryPathIdx),
+        ...pathsObj.paths.slice(pathsObj.primaryPathIdx + 1)
+      ].flat()));
     }
   }
   
@@ -159,7 +171,7 @@ function Play() {
         resultTimeoutId.current = setTimeout(() => {
           setResultShowing(false);
         }, 1000);
-        setScore(calcScore(submittedWord, primaryPath, gameInstanceRef.current, score));
+        setScore(gameInstanceRef.current.calcTotalScoreAndUpdateStats(submittedWord, primaryPath));
         // get empty spaces array of arrays by submitting primary path
         const emptySpaces = gameInstanceRef.current.popBubbles([...primaryPath]);
         setEmptySpaces(emptySpaces);
@@ -171,7 +183,7 @@ function Play() {
         setTimeout(() => {
           setEmptySpaces(EMPTY_SPACES_INITIAL_VALUE);
           setPopCollapse(false);
-        }, 1000);
+        }, 1000)
       }
       // if submitted word is not found in dictionary, display message and ignore submission
       else {
@@ -196,6 +208,8 @@ function Play() {
     setWordInput('');
     setPaths([]);
     setPrimaryPathIdx(0);
+    setPrimaryPath(undefined);
+    setSecondaryPaths(undefined);
     gameInstanceRef.current.savedPaths = [];
   }
 

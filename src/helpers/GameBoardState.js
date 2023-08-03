@@ -22,6 +22,17 @@ class GameBoardState {
     this.hiddenNextRows = rows;
     this.totalRows = this.rows + this.visibleNextRows + this.hiddenNextRows;
     this.currentBoard = this.createNewBoard();
+    this.score = 0;
+    this.numOfWords = 0;
+    this.bestWord = null;
+    this.bestWordScore = 0;
+    this.bestWordBoardState = null;
+    this.craziestWord = null;
+    this.craziestWordScore = 0;
+    this.craziestWordBoardState = null;
+    this.longestWord = null;
+    this.longestWordScore = 0;
+    this.longestWordBoardState = null;
     /* 
       this.savedPaths is an array of objects of paths for a built string structured like:
       [
@@ -213,7 +224,8 @@ class GameBoardState {
       newPaths = extendedPaths.filter((path) => path.flag !== 2);
     }
 
-    // create object of paths and primary path index for return to Play.js
+    // Use newPaths created from any of the above to create object of paths
+    // and primary path index for return to Play.js
     const pathsObj = {paths: []};
     for (let i = 0; i < newPaths.length; i++) {
       pathsObj.paths.push(newPaths[i].path);
@@ -221,6 +233,7 @@ class GameBoardState {
         pathsObj.primaryPathIdx = i;
       }
     }
+
     return pathsObj;
   }
 
@@ -414,6 +427,101 @@ class GameBoardState {
     'S', 'S', 'T', 'T', 'T', 'T', 'T', 'T', 'U', 'U', 
     'U', 'U', 'V', 'V', 'W', 'W', 'X', 'Y', 'Y', 'Z'
   ];
+
+  calcCurrWordScore(word, primaryPath) {
+    let wordScorePreMult = 0;
+    for (const char of word) {
+      wordScorePreMult += GameBoardState.letterValues[char];
+    }
+    wordScorePreMult += GameBoardState.numOfLettersBonus[word.length];
+    let multiplier = 1;
+    for (const bubble of primaryPath) {
+      multiplier *= this.currentBoard[bubble[0]][bubble[1]].length;
+    }
+    return wordScorePreMult * multiplier;
+  }
+
+  calcSubmittedWordScore(word, primaryPath) {
+    // create current board string variable to store current board string if needed
+    let currBoardString;
+    let wordScorePreMult = 0;
+    // for each letter, create sum of letter values
+    for (const char of word) {
+      wordScorePreMult += GameBoardState.letterValues[char];
+    }
+    // add number of letters bonus
+    wordScorePreMult += GameBoardState.numOfLettersBonus[word.length];
+    // see if this is the craziest word so far, if so, update instance
+    if (wordScorePreMult > this.craziestWordScore) {
+      this.craziestWord = word;
+      this.craziestWordScore = wordScorePreMult;
+      currBoardString = this.convertCurrBoardToString(primaryPath);
+      this.craziestWordBoardState = currBoardString;
+    }
+    // see if this is the longest word so far, if so, update instance
+    const currWordLongestWordScore = (word.length * 1000) + wordScorePreMult;
+    if (currWordLongestWordScore > this.longestWordScore) {
+      this.longestWord = word;
+      this.longestWordScore = currWordLongestWordScore;
+      if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
+      this.longestWordBoardState = currBoardString;  
+    }
+    // check if multiplier bubbles used, if so, multiply by multiplier
+    let multiplier = 1;
+    for (const bubble of primaryPath) {
+      multiplier *= this.currentBoard[bubble[0]][bubble[1]].length;
+    }
+    let wordScore = wordScorePreMult * multiplier;
+    // see if this is the best word so far, if so, update instance
+    if (wordScore > this.bestWordScore) {
+      this.bestWordScore = wordScore;
+      this.bestWord = word;
+      if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
+      this.bestWordBoardState = currBoardString;
+    }
+  
+    return wordScore;    
+  }
+
+  calcTotalScoreAndUpdateStats(word, primaryPath) {
+    let wordScore = this.calcSubmittedWordScore(word, primaryPath);
+    this.score += wordScore;
+    this.numOfWords++;
+  
+    return this.score;
+  }
+
+  convertCurrBoardToString(primaryPath = []) {
+    const flatBoard = [];
+    for (const column of this.currentBoard) {
+      for (const letter of column.slice(0, this.rows)) {
+        flatBoard.push(letter.toLowerCase());
+      }
+    }
+    // make letters of primary path upper case to show path of word
+    for (const coordinate of primaryPath) {
+      const index = (+coordinate[0] * this.rows) + (+coordinate[1]);
+      flatBoard[index] = flatBoard[index].toUpperCase();
+    }
+    // create board state string
+    let boardStateString = '';
+    for (const letter of flatBoard) {
+      boardStateString += (letter[0]);
+      // after letter put 
+      if (letter.length > 1) boardStateString += (letter.length);
+    }
+
+    console.log(boardStateString);
+    return boardStateString;
+  }
+
+  static letterValues = { a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1,
+                          j: 8, k: 5, l: 1, m: 3,n: 1, o: 1, p: 3, q: 10, r: 1,
+                          s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10 };
+
+  static numOfLettersBonus = { 3: 0, 4: 1, 5: 2, 6: 3, 7: 5, 8: 7, 9: 10, 10: 13, 
+                               11: 16, 12: 20, 13: 24, 14: 29, 15: 34, 16: 39,
+                               17: 45, 18: 50, 19: 55, 20: 60 };
 
 }
 
