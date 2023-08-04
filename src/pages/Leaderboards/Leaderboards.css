@@ -1,0 +1,15 @@
+.Leaderboards-table-container.MuiTableContainer-root {
+  width: clamp(20rem, 100%, 40rem);
+  display: inline-block;
+}
+
+.Leaderboards-table-container .MuiTable-root {
+  width: 100%;
+}
+
+@media screen and (max-width: 420px) {
+  /* shows only 3 columns if screen width is less than 420px */
+  .Leaderboards-table-container .MuiTableCell-root:nth-of-type(n+4) {
+    display: none;
+  }
+}

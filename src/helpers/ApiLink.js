@@ -80,6 +80,12 @@ class ApiLink {
     const data = await this.request(`plays/${playId}`, updateInfo, "patch");
     return data.stats;
   }
+
+  /* Get leaderboard data */
+  static async getLeaderboards() {
+    const data = await this.request('leaderboards');
+    return data.leaderboards;
+  }
   
 }
 
