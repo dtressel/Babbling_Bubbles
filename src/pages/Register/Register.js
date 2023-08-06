@@ -6,6 +6,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import '../../sharedCSS/AuthForm.css';
+import '../../sharedCSS/styledClasses.css';
 
 const Register = () => {
   const { formData, handleFieldChange, resetFormData } = useFields({
@@ -37,7 +38,7 @@ const Register = () => {
 
   return (
     <div className="AuthForm">
-      <div className="AuthForm-innerWrapper">
+      <div className="AuthForm-innerWrapper rounded-paper">
         <h2>Register</h2>
         <form noValidate autoComplete="off" onSubmit={handleSubmit}>
           <TextField

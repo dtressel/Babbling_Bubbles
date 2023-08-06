@@ -19,9 +19,6 @@
 .AuthForm .AuthForm-innerWrapper {
   padding: 2rem;
   margin: 2rem;
-  background-color: rgb(255, 255, 255);
-  border-radius: 1rem;
-  box-shadow: 10px 10px 26px 0px rgba(161,159,161,1);
 }
 
 .AuthForm .AuthForm-button {
