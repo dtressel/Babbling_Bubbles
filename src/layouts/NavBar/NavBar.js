@@ -28,6 +28,18 @@ function NavBar() {
 
   const { currentUser, logoutUser } = useContext(UserContext);
 
+  const pageToRouteKey = {
+    Play: "play",
+    Leaderboards: "leaderboards",
+    Login: "login",
+    Register: "register",
+    "How To Play": "how-to-play",
+    Strategies: "strategies",
+    About: "about",
+    Stats: "stats",
+    Profile: `babblers/${currentUser.username}`
+  }
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -71,7 +83,7 @@ function NavBar() {
               {barLinks.map((page) => (
                 <Button
                   component={ReactRouterLink}
-                  to={`/${page.toLowerCase().replaceAll(' ', '-')}`}
+                  to={`/${pageToRouteKey[page]}`}
                   key={page}
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: "white", display: "block" }}
@@ -110,7 +122,7 @@ function NavBar() {
                 {learnLinks.map((link) => (
                   <MenuItem 
                     component={ReactRouterLink} 
-                    to={`/${link.toLowerCase().replaceAll(' ', '-')}`}
+                    to={`/${pageToRouteKey[link]}`}
                     key={link} 
                     onClick={handleCloseLearnMenu} 
                   >
@@ -180,7 +192,7 @@ function NavBar() {
                 {pages.map((page) => (
                   <MenuItem 
                     component={ReactRouterLink} 
-                    to={`/${page.toLowerCase().replaceAll(' ', '-')}`}
+                    to={`/${pageToRouteKey[page]}`}
                     key={page} 
                     onClick={handleCloseNavMenu}
                   >
@@ -215,7 +227,7 @@ function NavBar() {
               <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open User Info">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                    <Avatar alt={currentUser.username.toUpperCase()} src="/static/images/avatar/2.jpg" />
                   </IconButton>
                 </Tooltip>
 
@@ -239,7 +251,7 @@ function NavBar() {
                   {settings.map((setting) => (
                     <MenuItem 
                       component={ReactRouterLink} 
-                      to={`/${setting.toLowerCase().replaceAll(' ', '-')}`}
+                      to={`/${pageToRouteKey[setting]}`}
                       key={setting} 
                       onClick={handleCloseUserMenu}
                     >
@@ -265,7 +277,7 @@ function NavBar() {
                 {noUserLinks.map((page) => (
                   <Button
                     component={ReactRouterLink}
-                    to={`/${page.toLowerCase().replaceAll(' ', '-')}`}
+                    to={`/${pageToRouteKey[page]}`}
                     key={page}
                     sx={{ my: 2, color: "white" }}
                   >
@@ -275,9 +287,9 @@ function NavBar() {
                 </Box>
 
                 <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
-                  <Tooltip title="Open User Info">
+                  <Tooltip title="Click to login">
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                      <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                      <Avatar src="/static/images/avatar/2.jpg" />
                     </IconButton>
                   </Tooltip>
 
@@ -301,7 +313,7 @@ function NavBar() {
                     {noUserLinks.map((link) => (
                       <MenuItem 
                         component={ReactRouterLink} 
-                        to={`/${link.toLowerCase().replaceAll(' ', '-')}`}
+                        to={`/${pageToRouteKey[link]}`}
                         key={link} 
                         onClick={handleCloseUserMenu}
                       >

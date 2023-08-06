@@ -43,7 +43,7 @@ const router = createBrowserRouter([
         loader: null,
       },
       {
-        path: "profile",
+        path: "babblers/:username",
         element: <Profile />,
         loader: null,
       },
