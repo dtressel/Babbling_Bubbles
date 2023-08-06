@@ -4,12 +4,14 @@
     2. make change path button
     3. make backspace button
     4. make it so that when pressing spacebar anywhere, add space to input to trigger path change
+    5. add current word score
+    6. add change path button
 
   State management:
     1. Can we get rid of paths state and just reference GameBoardState instead when needed?
 */
 
-import { useState, useRef, useCallback, forwardRef, useContext } from 'react';
+import { useState, useRef, useCallback, forwardRef, useContext, useEffect } from 'react';
 import UserContext from "../../contexts/UserContext";
 import ApiLink from '../../helpers/ApiLink';
 import GameBoard from './GameBoard';
@@ -64,6 +66,22 @@ function Play() {
     }
   }, []); 
 
+  // useEffect(() => {
+  //   window.addEventListener("keydown", handleSpaceBarPress);
+  //   return () => {
+  //     window.removeEventListener("keydown", handleSpaceBarPress);
+  //   };
+  // }, []);
+
+  // const handleSpaceBarPress = (evt) => {
+  //   console.log(evt.target.localName);
+  //   console.log(wordInputElement);
+  //   // if (evt.target.localName !== 'body' && )
+  //   if (gameInProgress) {
+      
+  //   }
+  // }
+
   const handleDialogClose = () => {
     setDialogOpen(false);
   };
@@ -79,8 +97,9 @@ function Play() {
         setTimer((timer) => timer - 1);
       }, 1000);
       gameInstanceRef.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
-      console.log(currentUser);
-      playId.current = await ApiLink.newPlayAtUserStart({ userId: currentUser.userId });
+      if (currentUser) {
+        playId.current = await ApiLink.newPlayAtUserStart({ userId: currentUser.userId });
+      }
     }, 3000);
   }
 
@@ -90,9 +109,11 @@ function Play() {
     clearInterval(timerIntervalId.current);
     setTimer(null);
     // send update to database
-    const updateInfo = gameInstanceRef.current.getStatsOnGameEnd();
-    const returnedStats = await ApiLink.updatePlayAtGameOver(playId.current, updateInfo);
-    gameInstanceRef.current.setGameOverStats(returnedStats);
+    if (currentUser) {
+      const updateInfo = gameInstanceRef.current.getStatsOnGameEnd();
+      const returnedStats = await ApiLink.updatePlayAtGameOver(playId.current, updateInfo);
+      gameInstanceRef.current.setGameOverStats(returnedStats);
+    }
     setDialogOpen(true);
   }
 
