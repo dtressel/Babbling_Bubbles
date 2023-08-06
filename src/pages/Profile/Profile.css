@@ -1,0 +1,11 @@
+.Profile-card-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.Profile-card {
+  max-width: 50rem;
+  min-width: 15rem;
+  text-align: center;
+  margin: 1rem 0;
+}
