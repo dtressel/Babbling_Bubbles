@@ -3,7 +3,6 @@ import ApiLink from '../helpers/ApiLink';
 
 const useCurrentUser = () => {
   const [currentUser, setCurrentUser] = useState(undefined);
-  console.log(currentUser);
 
   useEffect(() => {
     const getUserInfo = async () => {
