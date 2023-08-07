@@ -1,7 +1,6 @@
 /* 
   Improvements to be made:
     1. When clicking on letters, work out primary path index so that the clicked path is the primary path
-    3. make backspace button
     5. add current word score
 
   State management:
@@ -39,7 +38,7 @@ function Play() {
   const [countdown, setCountdown] = useState(3);
   const [timer, setTimer] = useState(180);
   const [wordInput, setWordInput] = useState('');
-  const [result, setResult] = useState('placeholder for div height');
+  const [result, setResult] = useState('placeholder text for div height');
   const [resultShowing, setResultShowing] = useState(false);
   const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
   const [emptySpaces, setEmptySpaces] = useState(EMPTY_SPACES_INITIAL_VALUE);
@@ -102,7 +101,12 @@ function Play() {
         ].flat());
         return newPrimaryPathIndex;
       });
+      gameInstanceRef.current.calcCurrWordScore(wordInput);
     }
+  }
+
+  const removeLetter = () => {
+    processNewInput(wordInput.slice(0, wordInput.length - 1));
   }
 
   const handleDialogClose = () => {
@@ -167,8 +171,8 @@ function Play() {
     // ignore if word input length is greater than number of letters in game board
     // This stops GameBoardState from keeping track of word in needless scenarios
     if (str.length > COLUMNS * ROWS) return;
-    // if user typed a space change the primary path index and do not add space to input
-    if (str[str.length - 1] === ' ') {
+    // if user typed a non-letter, ignore
+    if (!/^[A-Za-z]+$/.test(str.at(-1))) {
       str = str.slice(0, -1);
       /* 
         If needed to go back to change path only on spacebar press in input, uncomment below and eleminate useEffect
@@ -204,6 +208,7 @@ function Play() {
         ...pathsObj.paths.slice(0, pathsObj.primaryPathIdx),
         ...pathsObj.paths.slice(pathsObj.primaryPathIdx + 1)
       ].flat());
+      gameInstanceRef.current.calcCurrWordScore(str);
     }
   }
   
@@ -300,8 +305,10 @@ function Play() {
     return (
       <div className="Play">
         <p>Score: {score}</p>
+        <p>Current Word Score: {gameInstanceRef.current.currWordScore}</p>
         <p>Timer: {timeDisplay}</p>
         <button onClick={changePath}>switch path</button>
+        <button onClick={removeLetter}>backspace</button>
         <GameBoard
           gameInstance={gameInstanceRef.current}
           primaryPath={gameInstanceRef.current.primaryPath}

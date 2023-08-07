@@ -33,6 +33,8 @@ class GameBoardState {
     this.longestWord = null;
     this.longestWordScore = 0;
     this.longestWordBoardState = null;
+    this.currWord = '';
+    this.currWordScore = 0;
     /* 
       savedPaths contains a history of paths including relevant duplicates
       savedPaths is an array of objects of paths for a built string structured like:
@@ -182,7 +184,6 @@ class GameBoardState {
     Only one path should be set as flag: 0
   */
   findPaths(newInput) {
-    console.log(this.savedPaths);
     let newPaths;
 
     let lastSavedPathsObj;
@@ -442,17 +443,23 @@ class GameBoardState {
     'U', 'U', 'V', 'V', 'W', 'W', 'X', 'Y', 'Y', 'Z'
   ];
 
-  calcCurrWordScore(word, primaryPath) {
+  calcCurrWordScore(word) {
+    console.log(word);
+    if (word.length < 3) return;
     let wordScorePreMult = 0;
+    // for each letter, create sum of letter values
     for (const char of word) {
       wordScorePreMult += GameBoardState.letterValues[char];
     }
+    // add number of letters bonus
     wordScorePreMult += GameBoardState.numOfLettersBonus[word.length];
+    // check if multiplier bubbles used, if so, multiply by multiplier
     let multiplier = 1;
-    for (const bubble of primaryPath) {
+    for (const bubble of this.primaryPath) {
       multiplier *= this.currentBoard[bubble[0]][bubble[1]].length;
     }
-    return wordScorePreMult * multiplier;
+    this.currWordScore = wordScorePreMult * multiplier;
+    console.log(this.currWordScore);
   }
 
   calcSubmittedWordScore(word, primaryPath) {
