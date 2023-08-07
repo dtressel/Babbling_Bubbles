@@ -1,7 +1,6 @@
 /* 
   Improvements to be made:
     1. When clicking on letters, work out primary path index so that the clicked path is the primary path
-    5. add current word score
 
   State management:
     1. Can we get rid of paths state and just reference GameBoardState instead when needed?
@@ -93,14 +92,13 @@ function Play() {
     if (evt.type === 'click' ||
         (evt.key === ' ' && gameInstanceRef.current && gameInstanceRef.current.gameActive)) {
       setPrimaryPathIdx((primaryPathIdx) => {
-        const oldPrimaryPath = [...gameInstanceRef.current.primaryPath];
         const newPrimaryPathIndex = (primaryPathIdx >= gameInstanceRef.current.currentPaths.length - 1) ? 0 : primaryPathIdx + 1;
         gameInstanceRef.current.primaryPath = new Set(gameInstanceRef.current.currentPaths[newPrimaryPathIndex]);
         gameInstanceRef.current.secondaryPaths = new Set([
           ...gameInstanceRef.current.currentPaths.slice(0, newPrimaryPathIndex),
           ...gameInstanceRef.current.currentPaths.slice(newPrimaryPathIndex + 1)
         ].flat());
-        gameInstanceRef.current.findNewPathCurrWordScore(oldPrimaryPath);
+        gameInstanceRef.current.findNewPathCurrWordScore();
         return newPrimaryPathIndex;
       });
       gameInstanceRef.current.calcCurrWordScore(wordInput);
@@ -277,6 +275,8 @@ function Play() {
     gameInstanceRef.current.primaryPath = undefined;
     gameInstanceRef.current.secondaryPaths = undefined;
     gameInstanceRef.current.savedPaths = [];
+    gameInstanceRef.current.currWordScore = 0;
+    gameInstanceRef.current.currPathMultiplier = 1;
   }
 
   if (notStarted) {

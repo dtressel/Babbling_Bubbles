@@ -34,6 +34,7 @@ class GameBoardState {
     this.longestWordScore = 0;
     this.longestWordBoardState = null;
     this.currWordScore = 0;
+    this.currPathMultiplier = 1;
     /* 
       savedPaths contains a history of paths including relevant duplicates
       savedPaths is an array of objects of paths for a built string structured like:
@@ -443,8 +444,11 @@ class GameBoardState {
   ];
 
   calcCurrWordScore(word) {
-    console.log(word);
-    if (word.length < 3) return;
+    if (word.length < 3) {
+      this.currWordScore = 0;
+      this.currPathMultiplier = 1;
+      return;
+    }
     let wordScorePreMult = 0;
     // for each letter, create sum of letter values
     for (const char of word) {
@@ -457,8 +461,8 @@ class GameBoardState {
     for (const bubble of this.primaryPath) {
       multiplier *= this.currentBoard[bubble[0]][bubble[1]].length;
     }
+    this.currPathMultiplier = multiplier;
     this.currWordScore = wordScorePreMult * multiplier;
-    console.log(this.currWordScore);
   }
 
   calcSubmittedWordScore(word, primaryPath) {
@@ -504,14 +508,12 @@ class GameBoardState {
   }
 
   // old primary path is already an array, new primary path is a set
-  findNewPathCurrWordScore(oldPrimaryPath) {
+  findNewPathCurrWordScore() {
     const newPrimaryPathMultiplier = [...this.primaryPath].reduce((accum, curr) => {
       return accum * this.currentBoard[curr[0]][curr[1]].length;
     }, 1);
-    const oldPrimaryPathMultiplier = oldPrimaryPath.reduce((accum, curr) => {
-      return accum * this.currentBoard[curr[0]][curr[1]].length;
-    }, 1);
-    this.currWordScore = (this.currWordScore * newPrimaryPathMultiplier) / oldPrimaryPathMultiplier;
+    this.currWordScore = this.currWordScore * newPrimaryPathMultiplier / this.currPathMultiplier;
+    this.currPathMultiplier = newPrimaryPathMultiplier;
   }
 
   calcTotalScoreAndUpdateStats(word, primaryPath) {
