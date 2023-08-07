@@ -56,7 +56,6 @@ function Play() {
   const resultTimeoutId = useRef();
   /* GameBoardState Instance */
   const gameInstanceRef = useRef();
-  const gameInstance = gameInstanceRef.current;
   const playId = useRef();
 
   const wordInputElement = useCallback((input) => {
@@ -115,8 +114,10 @@ function Play() {
     // send update to database
     if (currentUser) {
       const updateInfo = gameInstanceRef.current.getStatsOnGameEnd();
-      const returnedStats = await ApiLink.updatePlayAtGameOver(playId.current, updateInfo);
-      gameInstanceRef.current.setGameOverStats(returnedStats);
+      if (updateInfo) {
+        const returnedStats = await ApiLink.updatePlayAtGameOver(playId.current, updateInfo);
+        gameInstanceRef.current.setGameOverStats(returnedStats);
+      }
     }
     setDialogOpen(true);
   }

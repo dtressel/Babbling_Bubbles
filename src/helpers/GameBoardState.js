@@ -529,25 +529,23 @@ class GameBoardState {
 
   /* Collects stats to send to API */
   getStatsOnGameEnd() {
-    const statsForSend = {
-      baseInfo: {
-        score: this.score,
-        numOfWords: this.numOfWords,
-        bestWord: this.bestWord,
-        bestWordScore: this.bestWordScore,
-        bestWordBoardState: this.bestWordBoardState
-      },
-      extraStats: {
-        craziestWord: this.craziestWord,
-        craziestWordScore: this.craziestWordScore,
-        craziestWordBoardState: this.bestWordBoardState,
-        longestWord: this.longestWord,
-        longestWordScore: this.longestWordScore,
-        longestWordBoardState: this.longestWordBoardState
-      }
-    }
+    // if no words were found, short circuit
+    if (!this.score) return null;
+    // otherwise, create stats object
+    const baseInfoCategories = ["score", "numOfWords", "bestWord", "bestWordScore",
+                                "bestWordBoardState"];
+    const extraStatsCategories = ["craziestWord", "craziestWordScore", "bestWordBoardState",
+                                  "longestWord", "longestWordScore", "longestWodBoardState"];
+    const baseInfo = baseInfoCategories.reduce((accum, curr) => {
+      if (this[curr]) accum[curr] = this[curr];
+      return accum;
+    }, {});
+    const extraStats = extraStatsCategories.reduce((accum, curr) => {
+      if (this[curr]) accum[curr] = this[curr];
+      return accum;
+    }, {});
 
-    return statsForSend;
+    return { baseInfo, extraStats };
   }
 
   /* Sets the stats collected from backend on game over to game instance */
