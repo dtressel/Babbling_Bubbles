@@ -44,10 +44,7 @@ function Play() {
   const [wordInput, setWordInput] = useState('');
   const [result, setResult] = useState('placeholder for div height');
   const [resultShowing, setResultShowing] = useState(false);
-  const [paths, setPaths] = useState([]);
   const [primaryPathIdx, setPrimaryPathIdx] = useState(0);
-  const [primaryPath, setPrimaryPath] = useState();
-  const [secondaryPaths, setSecondaryPaths] = useState();
   const [emptySpaces, setEmptySpaces] = useState(EMPTY_SPACES_INITIAL_VALUE);
   const [popCollapse, setPopCollapse] = useState(false);
   const [score, setScore] = useState(0);
@@ -57,7 +54,9 @@ function Play() {
 
   const timerIntervalId = useRef();
   const resultTimeoutId = useRef();
+  /* GameBoardState Instance */
   const gameInstanceRef = useRef();
+  const gameInstance = gameInstanceRef.current;
   const playId = useRef();
 
   const wordInputElement = useCallback((input) => {
@@ -66,21 +65,26 @@ function Play() {
     }
   }, []); 
 
-  // useEffect(() => {
-  //   window.addEventListener("keydown", handleSpaceBarPress);
-  //   return () => {
-  //     window.removeEventListener("keydown", handleSpaceBarPress);
-  //   };
-  // }, []);
+  useEffect(() => {
+    window.addEventListener("keydown", changePath);
+    return () => {
+      window.removeEventListener("keydown", changePath);
+    };
+  }, []);
 
-  // const handleSpaceBarPress = (evt) => {
-  //   console.log(evt.target.localName);
-  //   console.log(wordInputElement);
-  //   // if (evt.target.localName !== 'body' && )
-  //   if (gameInProgress) {
-      
-  //   }
-  // }
+  const changePath = (evt) => {
+    if (evt.key === ' ' && gameInstanceRef.current && !gameInstanceRef.current.avgWordScore) {
+      setPrimaryPathIdx((primaryPathIdx) => {
+        const newPrimaryPathIndex = (primaryPathIdx >= gameInstanceRef.current.currentPaths.length - 1) ? 0 : primaryPathIdx + 1;
+        gameInstanceRef.current.primaryPath = new Set(gameInstanceRef.current.currentPaths[newPrimaryPathIndex]);
+        gameInstanceRef.current.secondaryPaths = new Set([
+          ...gameInstanceRef.current.currentPaths.slice(0, newPrimaryPathIndex),
+          ...gameInstanceRef.current.currentPaths.slice(newPrimaryPathIndex + 1)
+        ].flat());
+        return newPrimaryPathIndex;
+      });
+    }
+  }
 
   const handleDialogClose = () => {
     setDialogOpen(false);
@@ -145,13 +149,17 @@ function Play() {
     // if user typed a space change the primary path index and do not add space to input
     if (str[str.length - 1] === ' ') {
       str = str.slice(0, -1);
-      const newPrimaryPathIndex = (primaryPathIdx >= paths.length - 1) ? 0 : primaryPathIdx + 1;
-      setPrimaryPathIdx(newPrimaryPathIndex);
-      setPrimaryPath(new Set(paths[newPrimaryPathIndex]));
-      setSecondaryPaths(new Set([
-        ...paths.slice(0, newPrimaryPathIndex),
-        ...paths.slice(newPrimaryPathIndex + 1)
-      ].flat()));
+      /* 
+        If needed to go back to change path only on spacebar press in input, uncomment below and eleminate useEffect
+        useEffect and changePath function
+       */
+      // const newPrimaryPathIndex = (primaryPathIdx >= gameInstanceRef.current.currentPaths.length - 1) ? 0 : primaryPathIdx + 1;
+      // setPrimaryPathIdx(newPrimaryPathIndex);
+      // gameInstanceRef.current.primaryPath = new Set(gameInstanceRef.current.currentPaths[newPrimaryPathIndex]);
+      // gameInstanceRef.current.secondaryPaths = new Set([
+      //   ...gameInstanceRef.current.currentPaths.slice(0, newPrimaryPathIndex),
+      //   ...gameInstanceRef.current.currentPaths.slice(newPrimaryPathIndex + 1)
+      // ].flat());
     }
     // Otherwise, if user didn't type a space
     else {
@@ -168,13 +176,13 @@ function Play() {
       // set currWordScore
       // const currWordScore = gameInstanceRef.current.calcCurrWordScore(str, primaryPath);
       // set paths and primary path index here in Play.js
-      setPaths(pathsObj.paths);
+      gameInstanceRef.current.currentPaths = pathsObj.paths;
       setPrimaryPathIdx(pathsObj.primaryPathIdx);
-      setPrimaryPath(new Set(pathsObj.paths[pathsObj.primaryPathIdx]));
-      setSecondaryPaths(new Set([
+      gameInstanceRef.current.primaryPath = new Set(pathsObj.paths[pathsObj.primaryPathIdx]);
+      gameInstanceRef.current.secondaryPaths = new Set([
         ...pathsObj.paths.slice(0, pathsObj.primaryPathIdx),
         ...pathsObj.paths.slice(pathsObj.primaryPathIdx + 1)
-      ].flat()));
+      ].flat());
     }
   }
   
@@ -183,7 +191,7 @@ function Play() {
     evt.preventDefault();
     const submittedWord = wordInput.toLowerCase();
     // if paths exist then submitted word is on board so continue
-    if (paths.length) {
+    if (gameInstanceRef.current.currentPaths.length) {
       // if submitted word is less than 3 letters, display message and ignore submission
       if (submittedWord.length < 3) {
         setResult(`word must contain at least 3 letters`);
@@ -201,9 +209,9 @@ function Play() {
         resultTimeoutId.current = setTimeout(() => {
           setResultShowing(false);
         }, 1000);
-        setScore(gameInstanceRef.current.calcTotalScoreAndUpdateStats(submittedWord, primaryPath));
+        setScore(gameInstanceRef.current.calcTotalScoreAndUpdateStats(submittedWord, gameInstanceRef.current.primaryPath));
         // get empty spaces array of arrays by submitting primary path
-        const emptySpaces = gameInstanceRef.current.popBubbles([...primaryPath]);
+        const emptySpaces = gameInstanceRef.current.popBubbles([...gameInstanceRef.current.primaryPath]);
         setEmptySpaces(emptySpaces);
         // start animation, pop collapse shrinks empty spaces to zero
         setTimeout(() => {
@@ -236,10 +244,10 @@ function Play() {
     }
     // reset everything to be ready for a new word and new paths
     setWordInput('');
-    setPaths([]);
+    gameInstanceRef.current.currentPaths = [];
     setPrimaryPathIdx(0);
-    setPrimaryPath(undefined);
-    setSecondaryPaths(undefined);
+    gameInstanceRef.current.primaryPath = undefined;
+    gameInstanceRef.current.secondaryPaths = undefined;
     gameInstanceRef.current.savedPaths = [];
   }
 
@@ -274,8 +282,8 @@ function Play() {
         <p>Timer: {timeDisplay}</p>
         <GameBoard
           gameInstance={gameInstanceRef.current}
-          primaryPath={primaryPath}
-          secondaryPaths={secondaryPaths}
+          primaryPath={gameInstanceRef.current.primaryPath}
+          secondaryPaths={gameInstanceRef.current.secondaryPaths}
           handleBubbleClick={handleBubbleClick}
           emptySpaces={emptySpaces}
           popCollapse={popCollapse}
@@ -317,8 +325,8 @@ function Play() {
         <p>Timer: {timeDisplay}</p>
         <GameBoard
           gameInstance={gameInstanceRef.current}
-          primaryPath={primaryPath}
-          secondaryPaths={secondaryPaths}
+          primaryPath={gameInstanceRef.current.primaryPath}
+          secondaryPaths={gameInstanceRef.current.secondaryPaths}
           emptySpaces={emptySpaces}
         />
         <Dialog

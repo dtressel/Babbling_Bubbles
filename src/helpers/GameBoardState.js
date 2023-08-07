@@ -34,7 +34,8 @@ class GameBoardState {
     this.longestWordScore = 0;
     this.longestWordBoardState = null;
     /* 
-      this.savedPaths is an array of objects of paths for a built string structured like:
+      savedPaths contains a history of paths including relevant duplicates
+      savedPaths is an array of objects of paths for a built string structured like:
       [
         {
           input: "a",
@@ -67,6 +68,12 @@ class GameBoardState {
       flag values: 0: primary, 1: secondary, 2: relevant duplicates
     */
     this.savedPaths = [];
+    /* an array of paths for current board state, allows easy primary path switching */
+    this.currentPaths = [];
+    /* a set of coordinates for the primary path */
+    this.primaryPath = null;
+    /* a set of coordinates for all bubbles in all secondary paths */
+    this.secondaryPaths = null;
     // To be set on game end
     this.avgWordScore = null;
     this.curr100Wma = null;
