@@ -1,11 +1,8 @@
 /* 
   Improvements to be made:
     1. When clicking on letters, work out primary path index so that the clicked path is the primary path
-    2. make change path button
     3. make backspace button
-    4. make it so that when pressing spacebar anywhere, add space to input to trigger path change
     5. add current word score
-    6. add change path button
 
   State management:
     1. Can we get rid of paths state and just reference GameBoardState instead when needed?
@@ -64,6 +61,7 @@ function Play() {
     }
   }, []); 
 
+  // changes path when space bar is pressed anywhere in window
   useEffect(() => {
     window.addEventListener("keydown", changePath);
     return () => {
@@ -71,8 +69,30 @@ function Play() {
     };
   }, []);
 
+  // prevents the page down default when press space bar when nothing in focus
+  // and prevents spaces from being entered in the input
+  useEffect(() => {
+    window.addEventListener("keypress", preventSpaceBarDefault);
+    return () => {
+      window.removeEventListener("keypress", preventSpaceBarDefault);
+    };
+  }, []);
+
+  // prevents the button click default when pressing space bar when a button is in focus
+  useEffect(() => {
+    window.addEventListener("keyup", preventSpaceBarDefault);
+    return () => {
+      window.removeEventListener("keyup", preventSpaceBarDefault);
+    };
+  }, []);
+
+  const preventSpaceBarDefault = (evt) => {
+    if (evt.key === ' ') evt.preventDefault();
+  }
+
   const changePath = (evt) => {
-    if (evt.key === ' ' && gameInstanceRef.current && !gameInstanceRef.current.avgWordScore) {
+    if (evt.type === 'click' ||
+        (evt.key === ' ' && gameInstanceRef.current && gameInstanceRef.current.gameActive)) {
       setPrimaryPathIdx((primaryPathIdx) => {
         const newPrimaryPathIndex = (primaryPathIdx >= gameInstanceRef.current.currentPaths.length - 1) ? 0 : primaryPathIdx + 1;
         gameInstanceRef.current.primaryPath = new Set(gameInstanceRef.current.currentPaths[newPrimaryPathIndex]);
@@ -281,6 +301,7 @@ function Play() {
       <div className="Play">
         <p>Score: {score}</p>
         <p>Timer: {timeDisplay}</p>
+        <button onClick={changePath}>switch path</button>
         <GameBoard
           gameInstance={gameInstanceRef.current}
           primaryPath={gameInstanceRef.current.primaryPath}

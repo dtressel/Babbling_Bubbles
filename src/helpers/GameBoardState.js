@@ -74,6 +74,7 @@ class GameBoardState {
     this.primaryPath = null;
     /* a set of coordinates for all bubbles in all secondary paths */
     this.secondaryPaths = null;
+    this.gameActive = true;
     // To be set on game end
     this.avgWordScore = null;
     this.curr100Wma = null;
@@ -529,6 +530,7 @@ class GameBoardState {
 
   /* Collects stats to send to API */
   getStatsOnGameEnd() {
+    this.gameActive = false;
     // if no words were found, short circuit
     if (!this.score) return null;
     // otherwise, create stats object
