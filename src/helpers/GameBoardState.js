@@ -33,7 +33,6 @@ class GameBoardState {
     this.longestWord = null;
     this.longestWordScore = 0;
     this.longestWordBoardState = null;
-    this.currWord = '';
     this.currWordScore = 0;
     /* 
       savedPaths contains a history of paths including relevant duplicates
@@ -502,6 +501,17 @@ class GameBoardState {
     }
   
     return wordScore;    
+  }
+
+  // old primary path is already an array, new primary path is a set
+  findNewPathCurrWordScore(oldPrimaryPath) {
+    const newPrimaryPathMultiplier = [...this.primaryPath].reduce((accum, curr) => {
+      return accum * this.currentBoard[curr[0]][curr[1]].length;
+    }, 1);
+    const oldPrimaryPathMultiplier = oldPrimaryPath.reduce((accum, curr) => {
+      return accum * this.currentBoard[curr[0]][curr[1]].length;
+    }, 1);
+    this.currWordScore = (this.currWordScore * newPrimaryPathMultiplier) / oldPrimaryPathMultiplier;
   }
 
   calcTotalScoreAndUpdateStats(word, primaryPath) {

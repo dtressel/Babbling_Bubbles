@@ -93,12 +93,14 @@ function Play() {
     if (evt.type === 'click' ||
         (evt.key === ' ' && gameInstanceRef.current && gameInstanceRef.current.gameActive)) {
       setPrimaryPathIdx((primaryPathIdx) => {
+        const oldPrimaryPath = [...gameInstanceRef.current.primaryPath];
         const newPrimaryPathIndex = (primaryPathIdx >= gameInstanceRef.current.currentPaths.length - 1) ? 0 : primaryPathIdx + 1;
         gameInstanceRef.current.primaryPath = new Set(gameInstanceRef.current.currentPaths[newPrimaryPathIndex]);
         gameInstanceRef.current.secondaryPaths = new Set([
           ...gameInstanceRef.current.currentPaths.slice(0, newPrimaryPathIndex),
           ...gameInstanceRef.current.currentPaths.slice(newPrimaryPathIndex + 1)
         ].flat());
+        gameInstanceRef.current.findNewPathCurrWordScore(oldPrimaryPath);
         return newPrimaryPathIndex;
       });
       gameInstanceRef.current.calcCurrWordScore(wordInput);
