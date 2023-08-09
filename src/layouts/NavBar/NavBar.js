@@ -36,7 +36,7 @@ function NavBar() {
     "How To Play": "how-to-play",
     Strategies: "strategies",
     About: "about",
-    Profile: `babblers/${currentUser.username}`
+    Profile: `babblers/${currentUser && currentUser.username}`
   }
 
   const handleOpenNavMenu = (event) => {
