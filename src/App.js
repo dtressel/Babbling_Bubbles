@@ -10,7 +10,6 @@ import Profile from './pages/Profile';
 import Leaderboards from './pages/Leaderboards';
 import Strategies from './pages/Strategies';
 import About from './pages/About';
-import Stats from './pages/Stats';
 
 const router = createBrowserRouter([
   {
@@ -60,11 +59,6 @@ const router = createBrowserRouter([
       {
         path: "about",
         element: <About />,
-        loader: null,
-      },
-      {
-        path: "stats",
-        element: <Stats />,
         loader: null,
       },
     ],

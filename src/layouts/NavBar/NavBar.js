@@ -19,7 +19,7 @@ const barLinks = ["Play", "Leaderboards"];
 const noUserLinks = ["Login", "Register"];
 const learnLinks = ["How To Play", "Strategies", "About"];
 const pages = ["Play", "Leaderboards", "How To Play", "Strategies", "About"];
-const settings = ["Stats", "Profile"];
+const settings = ["Profile"];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -36,7 +36,6 @@ function NavBar() {
     "How To Play": "how-to-play",
     Strategies: "strategies",
     About: "about",
-    Stats: "stats",
     Profile: `babblers/${currentUser.username}`
   }
 
