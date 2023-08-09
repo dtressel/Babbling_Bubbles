@@ -164,10 +164,33 @@ function Play() {
   }
 
   const handleBubbleClick = (evt) => {
-    processNewInput(wordInput + evt.target.textContent.toLowerCase());
+    const coordinate = evt.target.id;
+    const word = wordInput + evt.target.textContent.toLowerCase();
+    // if primary path index was changed, record that change in GameBoardState
+    if (gameInstanceRef.current.savedPaths.length 
+      && gameInstanceRef.current.savedPaths.slice(-1)[0].paths.length
+      && gameInstanceRef.current.savedPaths.slice(-1)[0].paths[primaryPathIdx].flag !== 0) {
+      gameInstanceRef.current.setPrimaryPathIdx(primaryPathIdx);
+    }
+    // call findPaths in GameBoardState to create new paths or figure out if invalid
+    const pathsObj = gameInstanceRef.current.findPaths(word.toUpperCase(), coordinate);
+    // if illegal click (clicked a non-adjacent bubble), ignore
+    if (!pathsObj) return;
+    // Otherwise, continue
+    // show change in input
+    setWordInput(word);
+    // set paths and primary path index here in Play.js
+    gameInstanceRef.current.currentPaths = pathsObj.paths;
+    setPrimaryPathIdx(pathsObj.primaryPathIdx);
+    gameInstanceRef.current.primaryPath = new Set(pathsObj.paths[pathsObj.primaryPathIdx]);
+    gameInstanceRef.current.secondaryPaths = new Set([
+      ...pathsObj.paths.slice(0, pathsObj.primaryPathIdx),
+      ...pathsObj.paths.slice(pathsObj.primaryPathIdx + 1)
+    ].flat());
+    gameInstanceRef.current.calcCurrWordScore(word);
   }
 
-  const processNewInput = (str) => {
+  const processNewInput = (str, coordinate) => {
     // ignore if word input length is greater than number of letters in game board
     // This stops GameBoardState from keeping track of word in needless scenarios
     if (str.length > COLUMNS * ROWS) return;
@@ -197,7 +220,7 @@ function Play() {
         gameInstanceRef.current.setPrimaryPathIdx(primaryPathIdx);
       }
       // call findPaths in GameBoardState to create new paths
-      const pathsObj = gameInstanceRef.current.findPaths(str.toUpperCase());
+      const pathsObj = gameInstanceRef.current.findPaths(str.toUpperCase(), coordinate);
       // set currWordScore
       // const currWordScore = gameInstanceRef.current.calcCurrWordScore(str, primaryPath);
       // set paths and primary path index here in Play.js

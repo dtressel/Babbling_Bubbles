@@ -33,6 +33,7 @@ const GameBoard = ({ gameInstance, primaryPath, secondaryPaths, handleBubbleClic
                         ${primaryPath && primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' :
                           (secondaryPaths && secondaryPaths.has(`${columnIdx}${rowIdx}`) ? 'Play-secondary-location' : '')}
                       `}
+                    id={`${columnIdx}${rowIdx}`}
                     onClick={handleBubbleClick}
                   >
                     {letter[0]}

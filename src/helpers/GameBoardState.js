@@ -182,10 +182,11 @@ class GameBoardState {
         }
       ]
     Only one path should be set as flag: 0
-  */
-  findPaths(newInput) {
-    let newPaths;
 
+    coordinate paramter is optional and used for clicked bubbles
+  */
+  findPaths(newInput, coordinate) {
+    let newPaths;
     let lastSavedPathsObj;
     let savedInput = '';
     let savedInputLength = 0;
@@ -220,11 +221,13 @@ class GameBoardState {
     }
     // if new input is one character, find occurances of first letter
     else if (newInputLength === 1) {
-      newPaths = GameBoardState.findPathForFirstLetter.call(this, newInput);
+      newPaths = GameBoardState.findPathForFirstLetter.call(this, newInput, coordinate);
     }
     // Finally, if user added one character to the input field, find new paths based on saved paths
     else if (newInputLength === savedInputLength + 1) {
-      let extendedPaths = GameBoardState.extendPaths.call(this, newInput[newInputLength - 1]);
+      let extendedPaths = GameBoardState.extendPaths.call(this, newInput[newInputLength - 1], coordinate);
+      // If a coordinate and there are no paths, return undefined to ignore click
+      if (coordinate && !extendedPaths.length) return undefined;
       // since the above may create duplicate paths, check for and remove duplicate paths
       if (extendedPaths.length > 1) {
         GameBoardState.removeDuplicatePaths(extendedPaths);
@@ -272,19 +275,18 @@ class GameBoardState {
       );
       finalPaths = extendedPaths;
     }
-    console.log(finalPaths);
     return finalPaths;
     // find paths for last letter and save return value
   }
 
-  static findPathForFirstLetter(letter) {
+  // coordinate parameter is optional
+  static findPathForFirstLetter(letter, coordinate) {
     this.savedPaths = [];
     const paths = [];
     for (let i = 0; i < this.columns; i++) {
       for (let j = 0; j < this.rows; j++) {
         if (letter === this.currentBoard[i][j][0]) {
-          
-          if (!paths.length) {
+          if ((!coordinate && !paths.length) || (coordinate === `${i}${j}`)) {
             paths.push({ path: [`${i}${j}`], flag: 0 });
           }
           else {
@@ -302,7 +304,8 @@ class GameBoardState {
     return paths;
   }
 
-  static extendPaths(letter) {
+  // coordinate parameter is optional
+  static extendPaths(letter, coordinate) {
     const oldPaths = this.savedPaths[this.savedPaths.length - 1].paths;
     let makePrimary = false;
     const foundPathsCumulative = [];
@@ -313,12 +316,22 @@ class GameBoardState {
       const currRow = +oldPaths[i].path[oldPaths[i].path.length - 1][1];
       const foundPaths = [];
       if (oldPaths[i].flag === 0) makePrimary = true;
-      foundPaths.push(
-        ...GameBoardState.testNeighbors.call(this, currColumn, currRow, letter, oldPaths[i], makePrimary)
-      );
-      if (makePrimary && foundPaths.length) makePrimary = false;
+      const newFoundPaths = GameBoardState.testNeighbors.call(this, currColumn, currRow, letter, oldPaths[i], makePrimary, coordinate);
+      foundPaths.push(...newFoundPaths.foundPaths);
+      if (newFoundPaths.madeOnePrimary) makePrimary = false;
       if (foundPaths.length) foundPathsCumulative.push(...foundPaths);
     }
+    // if none of the paths were made primary yet and there is a coordinate, find match, and make primary
+    if (coordinate && makePrimary && foundPathsCumulative.length) {
+      for (const path of foundPathsCumulative) {
+        if (path.path.at(-1) === coordinate) {
+          path.flag = 0;
+          makePrimary = false;
+        }
+      }
+    }
+    // if a coordinate and there was still no match on last bubble of any path, then illegal bubble click
+    if (coordinate && makePrimary) return [];
     if (makePrimary && foundPathsCumulative.length) {
       foundPathsCumulative[foundPathsCumulative.length - 1].flag = 0;
     }
@@ -326,7 +339,9 @@ class GameBoardState {
   }
 
   // returns and array of found paths
-  static testNeighbors(currColumn, currRow, letter, oldPath, makePrimary) {
+  // coordinate parameter is optional
+  static testNeighbors(currColumn, currRow, letter, oldPath, makePrimary, coordinate) {
+    let madeOnePrimary = false;
     const foundPaths = [];
     const startColumn = (currColumn - 1 >= 0) ? currColumn - 1 : currColumn;
     const endColumn = (currColumn + 1 < this.columns) ? currColumn + 1 : currColumn;
@@ -338,18 +353,23 @@ class GameBoardState {
         if (this.currentBoard[testColumn][testRow][0] === letter) {
           // if this bubble has not already been used in this path
           if (!oldPath.path.includes(`${testColumn}${testRow}`)) {
+            let flag = 1;
+            if (makePrimary && (!coordinate || coordinate === `${testColumn}${testRow}`)) {
+              flag = 0;
+              makePrimary = false;
+              madeOnePrimary = true;
+            }
             const foundPath = 
             {
               path: [...oldPath.path, `${testColumn}${testRow}`], 
-              flag: makePrimary ? 0 : 1
+              flag: flag
             }
-            if (makePrimary) makePrimary = false;
             foundPaths.push(foundPath);
           }
         }
       }
     }
-    return foundPaths;
+    return { foundPaths, madeOnePrimary };
   }
 
   static removeDuplicatePaths(extendedPaths) {
