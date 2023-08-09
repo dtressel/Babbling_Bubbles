@@ -1,6 +1,6 @@
 /* 
   Improvements to be made:
-    1. When clicking on letters, work out primary path index so that the clicked path is the primary path
+    1. Fix primary path issue from video on phone taken on 8/9/23
 
   State management:
     1. Can we get rid of paths state and just reference GameBoardState instead when needed?
