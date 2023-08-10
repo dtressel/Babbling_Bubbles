@@ -4,17 +4,6 @@ import ApiLink from '../helpers/ApiLink';
 const useCurrentUser = () => {
   const [currentUser, setCurrentUser] = useState(undefined);
 
-  useEffect(() => {
-    const getUserInfo = async () => {
-      const user = await ApiLink.getUser(currentUser.userId);
-      setCurrentUser(user);
-    }
-    // if there is user information from token but not yet full user info
-    if (currentUser && !currentUser.email) {
-      getUserInfo();
-    } 
-  }, [currentUser]);
-
   if (currentUser === undefined) {
     const savedUser = JSON.parse(localStorage.getItem("user"));
     if (savedUser) {
@@ -23,6 +12,8 @@ const useCurrentUser = () => {
       ApiLink.token = token;
     }
   }
+
+  console.log(currentUser);
 
   /* 
     signupInfo is an object
@@ -42,6 +33,8 @@ const useCurrentUser = () => {
         {
           userId: userData.user.id,
           username: userData.user.username,
+          permissions: userData.user.permissions,
+          country: userData.user.country,
           token: userData.token
         }
       ));
@@ -65,6 +58,8 @@ const useCurrentUser = () => {
         {
           userId: userData.user.id,
           username: userData.user.username,
+          permissions: userData.user.permissions,
+          country: userData.user.country,
           token: userData.token
         }
       ));
@@ -95,6 +90,8 @@ const useCurrentUser = () => {
         {
           userId: updatedUser.id,
           username: updatedUser.username,
+          permissions: updatedUser.permissions,
+          country: updatedUser.country,
           token: ApiLink.token
         }
       ));
