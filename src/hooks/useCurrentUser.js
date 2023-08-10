@@ -31,7 +31,7 @@ const useCurrentUser = () => {
       setCurrentUser(userData.user);
       localStorage.setItem("user", JSON.stringify(
         {
-          userId: userData.user.id,
+          userId: userData.user.userId,
           username: userData.user.username,
           permissions: userData.user.permissions,
           country: userData.user.country,
@@ -56,7 +56,7 @@ const useCurrentUser = () => {
       setCurrentUser(userData.user);
       localStorage.setItem("user", JSON.stringify(
         {
-          userId: userData.user.id,
+          userId: userData.user.userId,
           username: userData.user.username,
           permissions: userData.user.permissions,
           country: userData.user.country,
@@ -88,7 +88,7 @@ const useCurrentUser = () => {
       setCurrentUser(() => (updatedUser));
       localStorage.setItem("user", JSON.stringify(
         {
-          userId: updatedUser.id,
+          userId: updatedUser.userId,
           username: updatedUser.username,
           permissions: updatedUser.permissions,
           country: updatedUser.country,
