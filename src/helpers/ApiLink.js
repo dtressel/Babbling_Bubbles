@@ -86,6 +86,12 @@ class ApiLink {
     const data = await this.request('leaderboards');
     return data.leaderboards;
   }
+
+  /* Get more stats for user */
+  static async getMoreStats(userId) {
+    const data = await this.request(`users/${userId}/more-stats`);
+    return data.stats;
+  }
   
 }
 
