@@ -17,7 +17,6 @@ const Leaderboards = () => {
   useEffect(() => {
     const getLeaderboardData = async () => {
       const res = await ApiLink.getLeaderboards();
-      console.log(res)
       setLeaderboards(res);
     }
     getLeaderboardData();
