@@ -9,6 +9,7 @@ import './Leaderboards.css';
 
 const tableAndColumnTitleKey = {
   bestAvgWordScoreMin15: "Single Game Highest Average Word Score",
+  bestAvgWordScore: "Single Game Highest Average Word Score",
   bestCurrent100Wma: "Highest Current 100 WMA",
   bestCurrent10Wma: "Highest Current 10 WMA",
   bestPeak100Wma: "Highest Peak 100 WMA",
