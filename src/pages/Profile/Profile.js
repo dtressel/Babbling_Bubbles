@@ -87,26 +87,28 @@ const Profile = () => {
           }
         </div>
       </div>
-      <div className="Profile-card-wrapper">
-        <div className="Profile-card rounded-paper">
-          <div className="Profile-personal-leaderboards">
-            <h3 className="Profile-personal-leaderboards-header">Personal Leaderboards:</h3>
-            {leaderboardOrder.reduce((accum, leaderboardTitle) => {
-              if (moreStats[leaderboardTitle].length) {
-                accum.push(
-                  <LeaderboardTable
-                    title={leaderboardTitle}
-                    columnHeaders={Object.keys(moreStats[leaderboardTitle][0])}
-                    rows={moreStats[leaderboardTitle].map(row => Object.values(row))}
-                    key={leaderboardTitle}
-                  />
-                );
-              }
-              return accum;
-            }, [])}
+      {moreStats && 
+        <div className="Profile-card-wrapper">
+          <div className="Profile-card rounded-paper">
+            <div className="Profile-personal-leaderboards">
+              <h3 className="Profile-personal-leaderboards-header">Personal Leaderboards:</h3>
+              {leaderboardOrder.reduce((accum, leaderboardTitle) => {
+                if (moreStats[leaderboardTitle].length) {
+                  accum.push(
+                    <LeaderboardTable
+                      title={leaderboardTitle}
+                      columnHeaders={Object.keys(moreStats[leaderboardTitle][0])}
+                      rows={moreStats[leaderboardTitle].map(row => Object.values(row))}
+                      key={leaderboardTitle}
+                    />
+                  );
+                }
+                return accum;
+              }, [])}
+            </div>
           </div>
         </div>
-      </div>
+      }
     </>
   )
 }
