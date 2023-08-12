@@ -11,6 +11,16 @@ const useFields = (initialState) => {
       }
     ))
   }
+
+  const setFields = (fieldValueObj) => {
+    setFormData((formData) => (
+      {
+        ...formData,
+        ...fieldValueObj
+      }
+    ))
+  }
+
   const resetFormData = () => {
     console.log(initialState);
     setFormData(initialState);
@@ -23,7 +33,7 @@ const useFields = (initialState) => {
       }
     ))
   }
-  return { formData, handleFieldChange, resetFormData, resetPasswordField };
+  return { formData, handleFieldChange, setFields, resetFormData, resetPasswordField };
 }
 
 export default useFields;
