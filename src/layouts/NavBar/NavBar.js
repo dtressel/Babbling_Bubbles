@@ -19,7 +19,7 @@ const barLinks = ["Play", "Leaderboards"];
 const noUserLinks = ["Login", "Register"];
 const learnLinks = ["How To Play", "Strategies", "About"];
 const pages = ["Play", "Leaderboards", "How To Play", "Strategies", "About"];
-const settings = ["Profile"];
+const settings = ["Profile", "Change Password"];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -36,7 +36,8 @@ function NavBar() {
     "How To Play": "how-to-play",
     Strategies: "strategies",
     About: "about",
-    Profile: `babblers/${currentUser && currentUser.username}`
+    Profile: `babblers/${currentUser && currentUser.username}`,
+    "Change Password": "change-password"
   }
 
   const handleOpenNavMenu = (event) => {

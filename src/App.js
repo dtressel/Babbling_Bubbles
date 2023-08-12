@@ -10,6 +10,8 @@ import Profile from './pages/Profile';
 import Leaderboards from './pages/Leaderboards';
 import Strategies from './pages/Strategies';
 import About from './pages/About';
+import ChangePassword from './pages/ChangePassword';
+import UpdateUser from './pages/UpdateUser';
 
 const router = createBrowserRouter([
   {
@@ -59,6 +61,16 @@ const router = createBrowserRouter([
       {
         path: "about",
         element: <About />,
+        loader: null,
+      },
+      {
+        path: "change-password",
+        element: <ChangePassword />,
+        loader: null,
+      },
+      {
+        path: "update-user",
+        element: <UpdateUser />,
         loader: null,
       },
     ],
