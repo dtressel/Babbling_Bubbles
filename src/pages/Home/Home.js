@@ -1,4 +1,5 @@
 import Button from '@mui/material/Button';
+import { Link as ReactRouterLink } from "react-router-dom";
 import './Home.css';
 
 const Home = () => {
@@ -7,7 +8,8 @@ const Home = () => {
       <p>Play Babbling Bubbles now!</p>
       <Button
         variant="contained"
-        href="/play"
+        component={ReactRouterLink}
+        to="/play"
         sx={{
           background: "linear-gradient(90deg, rgba(9,161,182,1) 0%, rgba(0,212,255,1) 50%, rgba(9,161,182,1) 100%)",
           width: "6.4rem",
