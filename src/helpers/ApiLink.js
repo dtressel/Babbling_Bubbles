@@ -92,7 +92,6 @@ class ApiLink {
     const data = await this.request(`users/${userId}/more-stats`);
     return data.stats;
   }
-  
 }
 
 // for now, put token ("testuser" / "password" on class)
