@@ -125,7 +125,7 @@ function Play() {
       }, 1000);
       gameInstanceRef.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
       if (currentUser) {
-        playId.current = await ApiLink.newPlayAtUserStart({ userId: currentUser.userId });
+        playId.current = await ApiLink.newPlayAtUserStart({ userId: +currentUser.userId });
       }
     }, 3000);
   }
