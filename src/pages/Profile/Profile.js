@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Link as ReactRouterLink } from "react-router-dom";
 import UserContext from '../../contexts/UserContext';
 import ApiLink from '../../helpers/ApiLink';
 import Button from '@mui/material/Button';
@@ -13,7 +14,7 @@ const leaderboardOrder = [
 ];
 
 const Profile = () => {
-  const { currentUser } = useContext(UserContext);
+  const { currentUser, setAdditionalInfo } = useContext(UserContext);
   const { username } = useParams();
   const [userData, setUserData] = useState();
   const [moreStats, setMoreStats] = useState();
@@ -26,11 +27,12 @@ const Profile = () => {
       ]);
       setUserData(data[0]);
       setMoreStats(data[1]);
+      if (!currentUser.bio || !currentUser.email) {
+        setAdditionalInfo({ bio: data[0].bio, email: data[0].email });
+      }
     }
     getData();
-  }, [currentUser.userId]);
-  console.log(userData);
-  console.log(moreStats);
+  }, [currentUser.userId, currentUser.bio, currentUser.email, setAdditionalInfo]);
 
   return (
     <>
@@ -39,7 +41,7 @@ const Profile = () => {
           <h2>{username}</h2>
           {userData &&
             <>
-              {currentUser.userId === userData.userId && <Button variant="outlined">Update Info</Button>}
+              {+currentUser.userId === +userData.userId && <Button component={ReactRouterLink} variant="outlined" to="/update-user">Update Info</Button>}
               {userData.country && <div>{userData.country}</div>}
               <div>Babbler since {userData.dateRegistered}</div>
               {userData.bio && 
