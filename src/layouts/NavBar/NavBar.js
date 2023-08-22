@@ -207,7 +207,7 @@ function NavBar() {
               variant="h5"
               noWrap
               component={ReactRouterLink}
-              to=""
+              to="/"
               sx={{
                 mr: 2,
                 display: { xs: "flex", md: "none" },
@@ -286,6 +286,7 @@ function NavBar() {
                 ))}
                 </Box>
 
+                {/* User Menu tooltip with login/register in mobile mode */}    
                 <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
                   <Tooltip title="Click to login">
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
