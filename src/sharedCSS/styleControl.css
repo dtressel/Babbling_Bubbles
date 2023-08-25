@@ -1,0 +1,14 @@
+:root {
+  /* colors */
+  --mui-blue: rgb(61, 133, 198);
+  --light-sea-blue-green: rgb(162, 255, 255);
+  --lighter-sea-blue: rgb(192, 239, 255);
+  --light-sea-blue: rgb(148, 228, 255);
+  --hazy-green: rgb(181, 229, 230);
+  --blue-gradient: linear-gradient(90deg, rgba(9,161,182,1) 0%, rgba(0,212,255,1) 50%, rgba(9,161,182,1) 100%);
+
+  /* elements color */
+  --navbar: var(--mui-blue);
+  --body-background: var(--lighter-sea-blue);
+  --play-button: var(--blue-gradient);
+}

@@ -1,3 +1,5 @@
+import './BubblesBackground.css';
+
 const BubblesBackground = () => {
   return (
     <div className="BubblesBackground">

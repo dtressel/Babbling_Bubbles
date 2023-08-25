@@ -1,0 +1,5 @@
+.NavBar.MuiAppBar-root {
+  background-color: var(--navbar);
+  border-radius: 0.15rem;
+  width: calc(100% - 8px);
+}

@@ -14,6 +14,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Link as ReactRouterLink } from "react-router-dom";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import './NavBar.css';
 
 const barLinks = ["Play", "Leaderboards"];
 const noUserLinks = ["Login", "Register"];
@@ -72,7 +73,7 @@ function NavBar() {
     <Box sx={{display: "flex", justifyContent: "center" }}>
       <AppBar
         position="static"
-        sx={{ backgroundColor: "rgb(61, 133, 198)", borderRadius: "0.15rem", width: "calc(100% - 8px)" }}
+        className="NavBar"
       >
         {/* Container for all app bar content */}
         <Container maxWidth="xl">
