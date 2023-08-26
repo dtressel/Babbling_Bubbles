@@ -4,7 +4,7 @@
   width: calc(100% - 8px);
 }
 
-.NavBar-links.MuiButton-root, .NavBar-center-icon.MuiTypography-root, .NavBar-hamburger.MuiIconButton-root {
+.NavBar-links.MuiButton-root, .NavBar-logo-text.MuiTypography-root, .NavBar-hamburger.MuiIconButton-root {
   color: var(--navbar-text);
 }
 
@@ -13,10 +13,23 @@
   grid-template-columns: 1fr auto 1fr;
 }
 
-.NavBar-center-icon.MuiTypography-root {
-  margin: 0;
+.NavBar-logo-text.MuiTypography-root {
   font-family: 'Luckiest Guy';
   font-size: 1.6rem;
+  text-decoration: none;
+  letter-spacing: .2rem;
+}
+
+.NavBar-hamburger-wrapper.MuiBox-root, .NavBar-left-links.MuiBox-root {
+  grid-column: 1 / 2;
+}
+
+.NavBar-logo.MuiBox-root {
+  grid-column: 2 / 3;
+}
+
+.NavBar-user-icon.MuiBox-root, .NavBar-login-reg-container.MuiBox-root {
+  grid-column: 3 / 4;
 }
 
 .NavBar-user-icon.MuiBox-root {
@@ -29,13 +42,13 @@
 }
 
 @media screen and (max-width: 499px) {
-  .NavBar-center-icon.MuiTypography-root {
+  .NavBar-logo-text.MuiTypography-root {
     font-size: 1.4rem;
   }
 }
 
 @media screen and (max-width: 439px) {
-  .NavBar-center-icon.MuiTypography-root {
+  .NavBar-logo-text.MuiTypography-root {
     font-size: 1.2rem;
   }
 }

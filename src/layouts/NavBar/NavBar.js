@@ -80,7 +80,7 @@ function NavBar() {
           <Toolbar disableGutters className="NavBar-useable-space">
 
             {/* Left links in desktop mode */}
-            <Box sx={{ flexGrow: 1, display: { xs: "none", lg: "flex" } }}>
+            <Box className="NavBar-left-links" sx={{ flexGrow: 1, display: { xs: "none", lg: "flex" } }}>
               {barLinks.map((page) => (
                 <Button
                   className="NavBar-links"
@@ -135,27 +135,6 @@ function NavBar() {
               </Menu>
             </Box>
 
-            {/* Center Icon in desktop mode */}
-            <Box sx={{ display: { xs: "none", lg: "flex" } }}>
-              <Typography
-                className="NavBar-center-icon"
-                variant="h6"
-                noWrap
-                component={ReactRouterLink}
-                to="/"
-                sx={{
-                  mr: 2,
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  letterSpacing: ".2rem",
-                  textDecoration: "none",
-                  flexGrow: 2
-                }}
-              >
-                Babblin' Bubbles
-              </Typography>
-            </Box>
-
             {/* Hamburger Icon in Mobile Mode */}
             <Box
               className="NavBar-hamburger-wrapper"
@@ -207,27 +186,18 @@ function NavBar() {
               </Menu>
             </Box>
 
-            {/* Center Icon in mobile mode */}
-            <Box sx={{ display: { xs: "flex", lg: "none" } }}>
+            {/* Center Logo */}
+            <Box className="NavBar-logo">
               <Typography
-                className="NavBar-center-icon"
+                className="NavBar-logo-text"
                 variant="h6"
                 noWrap
                 component={ReactRouterLink}
                 to="/"
-                sx={{
-                  mr: 2,
-                  flexGrow: 1,
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  letterSpacing: ".2rem",
-                  textDecoration: "none"
-                }}
               >
                 Babblin' Bubbles
               </Typography>
             </Box>
-
               
             {/* User Icon */}
             {currentUser && 
