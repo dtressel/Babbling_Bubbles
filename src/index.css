@@ -19,3 +19,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  font-size: 110%;
+}
+
+@media screen and (max-width: 399px) {
+  :root {
+    font-size: 100%;
+  }
+}

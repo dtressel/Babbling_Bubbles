@@ -3,3 +3,39 @@
   border-radius: 0.15rem;
   width: calc(100% - 8px);
 }
+
+.NavBar-links.MuiButton-root, .NavBar-center-icon.MuiTypography-root, .NavBar-hamburger.MuiIconButton-root {
+  color: var(--navbar-text);
+}
+
+.NavBar-useable-space.MuiToolbar-root {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.NavBar-center-icon.MuiTypography-root {
+  margin: 0;
+  font-family: 'Luckiest Guy';
+  font-size: 1.6rem;
+}
+
+.NavBar-user-icon.MuiBox-root {
+  text-align: right;
+  justify-content: right;
+}
+
+.NavBar-login-reg-container.MuiBox-root {
+  justify-content: right;
+}
+
+@media screen and (max-width: 499px) {
+  .NavBar-center-icon.MuiTypography-root {
+    font-size: 1.4rem;
+  }
+}
+
+@media screen and (max-width: 439px) {
+  .NavBar-center-icon.MuiTypography-root {
+    font-size: 1.2rem;
+  }
+}

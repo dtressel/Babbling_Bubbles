@@ -77,17 +77,18 @@ function NavBar() {
       >
         {/* Container for all app bar content */}
         <Container maxWidth="xl">
-          <Toolbar disableGutters>
+          <Toolbar disableGutters className="NavBar-useable-space">
 
             {/* Left links in desktop mode */}
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+            <Box sx={{ flexGrow: 1, display: { xs: "none", lg: "flex" } }}>
               {barLinks.map((page) => (
                 <Button
+                  className="NavBar-links"
                   component={ReactRouterLink}
                   to={`/${pageToRouteKey[page]}`}
                   key={page}
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: "white", display: "block" }}
+                  sx={{ my: 2, display: "block" }}
                 >
                   {page}
                 </Button>
@@ -95,9 +96,10 @@ function NavBar() {
 
               {/* Learn button */}
               <Button
+                className="NavBar-links"
                 key="Learn"
                 onClick={handleOpenLearnMenu}
-                sx={{ my: 2, color: "white", display: "flex" }}
+                sx={{ my: 2, display: "flex" }}
               >
                 Learn
                 <ArrowDropDownIcon />
@@ -134,39 +136,41 @@ function NavBar() {
             </Box>
 
             {/* Center Icon in desktop mode */}
-            <Typography
-              variant="h6"
-              noWrap
-              component={ReactRouterLink}
-              to="/"
-              sx={{
-                mr: 2,
-                display: { xs: "none", md: "flex" },
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none",
-                flexGrow: 2
-              }}
-            >
-              Babbling Bubbles (big)
-            </Typography>
+            <Box sx={{ display: { xs: "none", lg: "flex" } }}>
+              <Typography
+                className="NavBar-center-icon"
+                variant="h6"
+                noWrap
+                component={ReactRouterLink}
+                to="/"
+                sx={{
+                  mr: 2,
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                  letterSpacing: ".2rem",
+                  textDecoration: "none",
+                  flexGrow: 2
+                }}
+              >
+                Babblin' Bubbles
+              </Typography>
+            </Box>
 
             {/* Hamburger Icon in Mobile Mode */}
             <Box
+              className="NavBar-hamburger-wrapper"
               sx={{
                 flexGrow: 1,
-                display: { xs: "flex", md: "none" },
+                display: { xs: "flex", lg: "none" },
               }}
             >
               <IconButton
+                className="NavBar-hamburger"
                 size="large"
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={handleOpenNavMenu}
-                color="inherit"
               >
                 <MenuIcon />
               </IconButton>
@@ -187,7 +191,7 @@ function NavBar() {
                 open={Boolean(anchorElNav)}
                 onClose={handleCloseNavMenu}
                 sx={{
-                  display: { xs: "block", md: "none" },
+                  display: { xs: "block", lg: "none" },
                 }}
               >
                 {pages.map((page) => (
@@ -204,28 +208,30 @@ function NavBar() {
             </Box>
 
             {/* Center Icon in mobile mode */}
-            <Typography
-              variant="h5"
-              noWrap
-              component={ReactRouterLink}
-              to="/"
-              sx={{
-                mr: 2,
-                display: { xs: "flex", md: "none" },
-                flexGrow: 1,
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none"
-              }}
-            >
-              Babbling Bubbles (small)
-            </Typography>
+            <Box sx={{ display: { xs: "flex", lg: "none" } }}>
+              <Typography
+                className="NavBar-center-icon"
+                variant="h6"
+                noWrap
+                component={ReactRouterLink}
+                to="/"
+                sx={{
+                  mr: 2,
+                  flexGrow: 1,
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                  letterSpacing: ".2rem",
+                  textDecoration: "none"
+                }}
+              >
+                Babblin' Bubbles
+              </Typography>
+            </Box>
+
               
             {/* User Icon */}
             {currentUser && 
-              <Box sx={{ flexGrow: 0 }}>
+              <Box sx={{ flexGrow: 0 }} className="NavBar-user-icon">
                 <Tooltip title="Open User Info">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                     <Avatar alt={currentUser.username.toUpperCase()} src="/static/images/avatar/2.jpg" />
@@ -274,13 +280,14 @@ function NavBar() {
             {!currentUser && 
               <>
                 {/* Login/Register buttons in desktop mode */}
-                <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' }}}>
+                <Box className="NavBar-login-reg-container" sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' }}}>
                 {noUserLinks.map((page) => (
                   <Button
+                    className="NavBar-links"
                     component={ReactRouterLink}
                     to={`/${pageToRouteKey[page]}`}
                     key={page}
-                    sx={{ my: 2, color: "white" }}
+                    sx={{ my: 2 }}
                   >
                     {page}
                   </Button>
@@ -288,7 +295,7 @@ function NavBar() {
                 </Box>
 
                 {/* User Menu tooltip with login/register in mobile mode */}    
-                <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
+                <Box className="NavBar-user-icon" sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
                   <Tooltip title="Click to login">
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                       <Avatar src="/static/images/avatar/2.jpg" />
