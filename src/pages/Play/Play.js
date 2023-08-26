@@ -21,10 +21,13 @@ import Slide from '@mui/material/Slide';
 import './Play.css';
 
 const wordDictionary = require('an-array-of-english-words');
+
 const COLUMNS = 5;
 const ROWS = 4;
 const VISIBLE_NEXT_ROWS = 2;
 const EMPTY_SPACES_INITIAL_VALUE = [...Array(COLUMNS)].map(() => ([]));
+const PAUSE_BEFORE_COLLAPSE = 200;
+const TIME_BEFORE_SNAP_TO_NEW_STATE = 1000;
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -265,12 +268,12 @@ function Play() {
         // start animation, pop collapse shrinks empty spaces to zero
         setTimeout(() => {
           setPopCollapse(true);
-        }, 200);
+        }, PAUSE_BEFORE_COLLAPSE);
         // end animation, clear empty spaces and set popCollapse to false to be ready for next pop
         setTimeout(() => {
           setEmptySpaces(EMPTY_SPACES_INITIAL_VALUE);
           setPopCollapse(false);
-        }, 1000)
+        }, TIME_BEFORE_SNAP_TO_NEW_STATE)
       }
       // if submitted word is not found in dictionary, display message and ignore submission
       else {
@@ -332,8 +335,10 @@ function Play() {
         <p>Score: {score}</p>
         <p>Current Word Score: {gameInstanceRef.current.currWordScore}</p>
         <p>Timer: {timeDisplay}</p>
-        <button onClick={changePath}>switch path</button>
-        <button onClick={removeLetter}>backspace</button>
+        <div className="Play-top-buttons">
+          <button onClick={changePath}>switch path</button>
+          <button onClick={removeLetter}>backspace</button>
+        </div>
         <GameBoard
           gameInstance={gameInstanceRef.current}
           primaryPath={gameInstanceRef.current.primaryPath}
