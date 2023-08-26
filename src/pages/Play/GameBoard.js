@@ -27,7 +27,7 @@ const GameBoard = ({ gameInstance, primaryPath, secondaryPaths, handleBubbleClic
                   <div 
                     className=
                       {`
-                        Play-letter-bubble 
+                        Play-letter-bubble
                         ${letter.length === 3 ? 'Play-triple-bubble' : ''}
                         ${letter.length === 2 ? 'Play-double-bubble' : ''} 
                         ${primaryPath && primaryPath.has(`${columnIdx}${rowIdx}`) ? 'Play-primary-location' :
