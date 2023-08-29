@@ -8,6 +8,88 @@
   margin-top: 3rem;
 }
 
+.Play-action-button {
+  color: rgb(55, 55, 55);
+  padding: 0.4rem;
+  border-radius: 0.4rem;
+  margin: 0.5rem;
+  border: none;
+  background-color: var(--play-action-buttons);
+  box-shadow: 0px 2px 4px gray;
+}
+
+.Play-action-button:hover {
+  color: black;
+}
+
+.Play-action-button:active {
+  box-shadow: inset 0px 2px 3px rgb(179, 179, 179);
+}
+
+.Play-word-input {
+  padding: 0.4rem;
+  border-radius: 0.3rem;
+  border: none;
+  box-shadow: 0px 1px 2px gray;
+}
+
+.Play-word-input:focus {
+  outline: 1px solid gray;
+}
+
+.Play-action-icon-button {
+  padding: .6rem;
+  border-radius: 50%;
+  margin: 0 0.8rem;
+  background-color: var(--play-action-buttons);
+  border: none;
+}
+
+.Play-top-buttons {
+  text-align: center;
+}
+
+.Play-top-buttons button {
+  text-decoration: none;
+  background-color: #f7f7f7;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#e7e7e7));
+  background-image: -webkit-linear-gradient(top, #f7f7f7, #e7e7e7); 
+  background-image: -moz-linear-gradient(top, #f7f7f7, #e7e7e7); 
+  background-image: -ms-linear-gradient(top, #f7f7f7, #e7e7e7); 
+  background-image: -o-linear-gradient(top, #f7f7f7, #e7e7e7); 
+  color: #a7a7a7;
+  position: relative;
+  text-align: center;
+  border-radius: 50%;
+  box-shadow: 0px 3px 8px #aaa, inset 0px 2px 3px #fff;
+  border: solid 1px transparent;
+}
+
+.Play-top-buttons button:before {
+  content: "";
+  display: block;
+  background: #fff;
+  border-top: 2px solid #ddd;
+  position: absolute;
+  top: -.4rem;
+  left: -.4rem;
+  bottom: -.4rem;
+  right: -.4rem;
+  z-index: -1;
+  border-radius: 50%;
+  box-shadow: inset 0px 8px 48px #ddd;
+}
+
+.Play-top-buttons button:active {
+  box-shadow: 0px 3px 4px #aaa inset, 0px 2px 3px #fff;
+}
+
+.Play-top-buttons button:hover {
+  text-decoration: none;
+  color: #555;
+  background: #f5f5f5;
+}
+
 .Play-before-start > div {
   font-size: 4em;
 }
@@ -20,11 +102,8 @@
 .Play-game-board {
   max-height: 14.4rem;
   overflow: hidden;
-  margin: 1rem;
-}
-
-.Play-top-buttons > button {
-  background-color: var(--sand);
+  margin: .8rem;
+  padding: .4rem 0 0;
 }
 
 .Play-extra-bubbles > div {
@@ -50,6 +129,11 @@
   position: relative;
   transform: skew(0deg, 0deg);
   background-color: var(--body-background);
+}
+
+.Play-letter-bubble:hover::after {
+  z-index: -1;
+  box-shadow: inset 0 2rem 4rem rgba(255, 255, 255, 0.3);
 }
 
 .Play-letter-bubble:after {

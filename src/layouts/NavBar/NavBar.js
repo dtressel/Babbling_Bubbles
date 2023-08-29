@@ -188,6 +188,9 @@ function NavBar() {
 
             {/* Center Logo */}
             <Box className="NavBar-logo">
+              <div className="logo-bubble-1"></div>
+              <div className="logo-bubble-2"></div>
+              <div className="logo-bubble-3"></div>
               <Typography
                 className="NavBar-logo-text"
                 variant="h6"

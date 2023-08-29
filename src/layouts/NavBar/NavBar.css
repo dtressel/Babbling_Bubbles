@@ -26,6 +26,7 @@
 
 .NavBar-logo.MuiBox-root {
   grid-column: 2 / 3;
+  position: relative;
 }
 
 .NavBar-user-icon.MuiBox-root, .NavBar-login-reg-container.MuiBox-root {

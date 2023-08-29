@@ -4,13 +4,17 @@
   --light-sea-blue-green: rgb(162, 255, 255);
   --lighter-sea-blue: rgb(192, 239, 255);
   --light-sea-blue: rgb(148, 228, 255);
+  --light-sea-blue: rgb(148, 228, 255);
+  --sea-blue: rgb(130, 224, 255);
   --hazy-green: rgb(181, 229, 230);
   --blue-gradient: linear-gradient(90deg, rgba(9,161,182,1) 0%, rgba(0,212,255,1) 50%, rgba(9,161,182,1) 100%);
   --triple-gold: gold;
   --double-peach: rgb(255, 179, 125);
   --sandy-peach: rgb(255, 233, 213);
   --sand: rgb(249, 231, 217);
+  --shadow-sand: rgb(243, 215, 193);
   --sunset-peach: rgb(255, 179, 165);
+  --sunset-pink: rgb(227, 154, 151);
   --black-gray: rgb(69, 69, 69);
   --footer-grey: rgb(116, 116, 116);
   --footer-blackish: rgb(31, 31, 31);
@@ -18,9 +22,12 @@
   /* elements color */
   --navbar: var(--sand);
   --body-background: var(--light-sea-blue);
+  --body-background-darker: var(--sea-blue);
   --play-button: var(--blue-gradient);
   --play-triple-bubble: var(--triple-gold);
   --play-double-bubble: var(--double-peach);
+  --play-action-buttons: var(--sand);
+  --play-action-buttons-hover: var(--shadow-sand);
   --navbar-text: var(--black-gray);
   --footer-text: var(--footer-grey);
   --footer-text-hover: var(--footer-blackish);
