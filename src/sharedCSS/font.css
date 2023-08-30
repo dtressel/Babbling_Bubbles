@@ -3,3 +3,9 @@
   src: local('Luckiest Guy'),
        url('../fonts/LuckiestGuy-Regular.ttf');
 }
+
+@font-face {
+  font-family: 'NTR';
+  src: local('NTR'),
+       url('../fonts/NTR-Regular.ttf');
+}

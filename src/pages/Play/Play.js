@@ -28,7 +28,7 @@ const wordDictionary = require('an-array-of-english-words');
 const COLUMNS = 5;
 const ROWS = 4;
 const VISIBLE_NEXT_ROWS = 2;
-const TIMER_LENGTH = 1800;
+const TIMER_LENGTH = 180;
 const EMPTY_SPACES_INITIAL_VALUE = [...Array(COLUMNS)].map(() => ([]));
 const PAUSE_BEFORE_COLLAPSE = 200;
 const TIME_BEFORE_SNAP_TO_NEW_STATE = 1000;
@@ -66,31 +66,13 @@ function Play() {
     }
   }, []); 
 
-  const changePath = useCallback((evt) => {
-    if (evt.type === 'click' ||
-        (evt.key === ' ' && gameInstanceRef.current && gameInstanceRef.current.gameActive)) {
-      setPrimaryPathIdx((primaryPathIdx) => {
-        const newPrimaryPathIndex = (primaryPathIdx >= gameInstanceRef.current.currentPaths.length - 1) ? 0 : primaryPathIdx + 1;
-        gameInstanceRef.current.primaryPath = new Set(gameInstanceRef.current.currentPaths[newPrimaryPathIndex]);
-        gameInstanceRef.current.secondaryPaths = new Set([
-          ...gameInstanceRef.current.currentPaths.slice(0, newPrimaryPathIndex),
-          ...gameInstanceRef.current.currentPaths.slice(newPrimaryPathIndex + 1)
-        ].flat());
-        gameInstanceRef.current.findNewPathCurrWordScore();
-        return newPrimaryPathIndex;
-      });
-      gameInstanceRef.current.calcCurrWordScore(wordInput);
-    }
-  })
-
-
   // changes path when space bar is pressed anywhere in window
   useEffect(() => {
     window.addEventListener("keydown", changePath);
     return () => {
       window.removeEventListener("keydown", changePath);
     };
-  }, [changePath]);
+  }, []);
 
   // prevents the page down default when press space bar when nothing in focus
   // and prevents spaces from being entered in the input
@@ -108,6 +90,23 @@ function Play() {
       window.removeEventListener("keyup", preventSpaceBarDefault);
     };
   }, []);
+
+  const changePath = (evt) => {
+    if (evt.type === 'click' ||
+        (evt.key === ' ' && gameInstanceRef.current && gameInstanceRef.current.gameActive)) {
+      setPrimaryPathIdx((primaryPathIdx) => {
+        const newPrimaryPathIndex = (primaryPathIdx >= gameInstanceRef.current.currentPaths.length - 1) ? 0 : primaryPathIdx + 1;
+        gameInstanceRef.current.primaryPath = new Set(gameInstanceRef.current.currentPaths[newPrimaryPathIndex]);
+        gameInstanceRef.current.secondaryPaths = new Set([
+          ...gameInstanceRef.current.currentPaths.slice(0, newPrimaryPathIndex),
+          ...gameInstanceRef.current.currentPaths.slice(newPrimaryPathIndex + 1)
+        ].flat());
+        gameInstanceRef.current.findNewPathCurrWordScore();
+        return newPrimaryPathIndex;
+      });
+      gameInstanceRef.current.calcCurrWordScore(wordInput);
+    }
+  }
 
   const preventSpaceBarDefault = (evt) => {
     if (evt.key === ' ') evt.preventDefault();
@@ -337,9 +336,17 @@ function Play() {
   if (gameInProgress) {
     return (
       <div className="Play">
-        <p>Timer: {timeDisplay}</p>
-        <p>Score: {score}</p>
-        <p>Current Word: {gameInstanceRef.current.currWordScore}</p>
+        <div className="Play-game-info-wrapper">
+          <div className="Play-game-info">
+            <div className="Play-timer">
+              <div>Time:&nbsp;</div>
+              <div className="Play-timer-digits">{timeDisplay}</div>
+            </div>
+            <div>Score: {score}</div>
+            <div>Current Word: {gameInstanceRef.current.currWordScore}</div>
+          </div>
+        </div>
+
         <div className="Play-top-buttons">
           <button className="Play-action-icon-button" onClick={removeLetter}>
             <FontAwesomeIcon icon={faDeleteLeft} size="xl" />
@@ -376,9 +383,9 @@ function Play() {
             })}
           </div>
         </div> */}
-        <form onSubmit={handleSubmit}>
+        <form className="Play-submit-form" onSubmit={handleSubmit}>
           <input className="Play-word-input" type='text' onChange={handleChange} value={wordInput} ref={wordInputElement} />
-          <button className="Play-action-button" type='submit'>Submit</button>
+          <button className="Play-submit-button" type='submit'>Submit</button>
         </form>
         <div className={resultShowing ? undefined : 'Play-result-hidden'}>{result}</div>
         <Button onClick={handleGameEnd}>End Game</Button>
@@ -403,14 +410,17 @@ function Play() {
           onClose={handleDialogClose}
           aria-describedby="alert-dialog-slide-description"
         >
-          <DialogTitle>{"Game Over!"}</DialogTitle>
+          <DialogTitle className="Play-popup-game-over-text">{"Game Over!"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-slide-description">
-              <div>Final Score: {score}</div>
-              <div># of Words Found: {gameInstanceRef.current.numOfWords}</div>
-              <div>Average Word Score: {gameInstanceRef.current.avgWordScore}</div>
+              <div className="Play-popup-highlight">
+                <div>Final Score:</div>
+                <div>{score}</div>
+              </div>
               <div>Best Word Found: {gameInstanceRef.current.bestWord}</div>
               <div>Best Word Score: {gameInstanceRef.current.bestWordScore}</div>
+              <div># of Words Found: {gameInstanceRef.current.numOfWords}</div>
+              <div>Average Word Score: {gameInstanceRef.current.avgWordScore}</div>
               <div>Longest Word Found: {gameInstanceRef.current.longestWord}</div>
               <div>Current 10 WMA: {gameInstanceRef.current.curr10Wma}</div>
               <div>Current 100 WMA: {gameInstanceRef.current.curr100Wma}</div>

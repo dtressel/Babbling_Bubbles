@@ -8,22 +8,45 @@
   margin-top: 3rem;
 }
 
-.Play-action-button {
-  color: rgb(55, 55, 55);
-  padding: 0.4rem;
-  border-radius: 0.4rem;
+.Play-game-info-wrapper {
+  display: flex;
+  justify-content: center;
   margin: 0.5rem;
-  border: none;
-  background-color: var(--play-action-buttons);
-  box-shadow: 0px 2px 4px gray;
 }
 
-.Play-action-button:hover {
-  color: black;
+.Play-game-info {
+  border-radius: 10% / 15%;
+  padding: .4rem;
 }
 
-.Play-action-button:active {
-  box-shadow: inset 0px 2px 3px rgb(179, 179, 179);
+.Play-game-info > div {
+  font-family: NTR;
+  font-size: 1.2rem;
+  line-height: 1.3rem;
+  margin: .4rem 0;
+}
+
+.Play-timer {
+  display: flex;
+  justify-content: center;
+}
+
+.Play-timer > div {
+  display: flex;
+  align-items: center;
+}
+
+.Play-timer > div:first-of-type {
+  padding: .2rem 0 0;
+}
+
+.Play-timer-digits {
+  font-size: 1.4rem;
+  font-family: NTR;
+  font-weight: 600;
+  border: 1px solid white;
+  border-radius: 10% / 15%;
+  padding: .3rem .4rem .1rem;
 }
 
 .Play-word-input {
@@ -47,9 +70,10 @@
 
 .Play-top-buttons {
   text-align: center;
+  padding: 0.4rem;
 }
 
-.Play-top-buttons button {
+.Play-top-buttons button, .Play-submit-button {
   text-decoration: none;
   background-color: #f7f7f7;
   background-image: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#e7e7e7));
@@ -60,9 +84,49 @@
   color: #a7a7a7;
   position: relative;
   text-align: center;
-  border-radius: 50%;
   box-shadow: 0px 3px 8px #aaa, inset 0px 2px 3px #fff;
   border: solid 1px transparent;
+}
+
+.Play-submit-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Play-submit-button {
+  color: #737373;
+  padding: .5rem .4rem .3rem;
+  border-radius: 20% / 30%;
+  margin: 0.5rem;
+  border: none;
+  font-family: NTR;
+  line-height: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.Play-submit-button:hover {
+  color: #262626;
+}
+
+.Play-submit-button:active {
+  box-shadow: inset 0px 2px 3px rgb(179, 179, 179);
+}
+
+.Play-submit-button:before {
+  content: "";
+  display: block;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  position: absolute;
+  top: -.3rem;
+  left: -.3rem;
+  bottom: -.3rem;
+  right: -.3rem;
+  z-index: -1;
+  border-radius: 24% / 35%;
+  box-shadow: inset 0px 8px 48px #ddd;
 }
 
 .Play-top-buttons button:before {
@@ -76,7 +140,7 @@
   bottom: -.4rem;
   right: -.4rem;
   z-index: -1;
-  border-radius: 50%;
+  border-radius: inherit;
   box-shadow: inset 0px 8px 48px #ddd;
 }
 
@@ -102,7 +166,7 @@
 .Play-game-board {
   max-height: 14.4rem;
   overflow: hidden;
-  margin: .8rem;
+  margin: .2rem .5rem .5rem;
   padding: .4rem 0 0;
 }
 
@@ -164,13 +228,11 @@
 }
 
 .Play-double-bubble {
-  border: 1px solid rgb(255, 179, 125);
-  outline: 1px solid rgb(255, 179, 125);
+  outline: 4px solid rgb(165, 169, 180);
 }
 
 .Play-triple-bubble {
-  border: 1px solid var(--play-triple-bubble);
-  outline: 3px solid var(--play-triple-bubble);
+  outline: 4px solid var(--play-triple-bubble);
 }
 
 .Play-empty-bubble-space {
@@ -199,4 +261,23 @@
 .Play-result-hidden {
   opacity: 0;
   transition: opacity 500ms ease-out;
+}
+
+.Play-popup-highlight {
+  margin: 1rem 0;
+  padding: .4rem;
+  text-align: center;
+  background-color: var(--light-sea-blue);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 3px rgb(255, 255, 136), 1px 2px 2px rgb(195, 195, 195);
+  color: black;
+}
+
+.Play-popup-highlight > div:last-of-type {
+  font-size: 1.6rem;
+}
+
+.Play-popup-game-over-text.MuiDialogTitle-root {
+  text-align: center;
+  margin-bottom: -1.6rem;
 }

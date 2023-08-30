@@ -1,6 +1,6 @@
 :root {
   /* colors */
-  --mui-blue: rgb(61, 133, 198);
+  --sea-blue-transparent: rgba(0, 150, 237, 0.466);
   --light-sea-blue-green: rgb(162, 255, 255);
   --lighter-sea-blue: rgb(192, 239, 255);
   --light-sea-blue: rgb(148, 228, 255);
@@ -28,6 +28,7 @@
   --play-double-bubble: var(--double-peach);
   --play-action-buttons: var(--sand);
   --play-action-buttons-hover: var(--shadow-sand);
+  --play-game-info-background: var(--sea-blue-transparent);
   --navbar-text: var(--black-gray);
   --footer-text: var(--footer-grey);
   --footer-text-hover: var(--footer-blackish);
