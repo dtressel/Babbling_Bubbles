@@ -24,6 +24,7 @@
   --body-background: var(--light-sea-blue);
   --body-background-darker: var(--sea-blue);
   --play-button: var(--blue-gradient);
+  --error-page-home-button: var(--blue-gradient);
   --play-triple-bubble: var(--triple-gold);
   --play-double-bubble: var(--double-peach);
   --play-action-buttons: var(--sand);
