@@ -4,10 +4,6 @@
   flex-grow: 1;
 }
 
-.Play-before-start > button, .Play-before-start > div {
-  margin-top: 3rem;
-}
-
 .Play-game-info-wrapper {
   display: flex;
   justify-content: center;

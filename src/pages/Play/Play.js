@@ -28,7 +28,6 @@ const wordDictionary = require('an-array-of-english-words');
 const COLUMNS = 5;
 const ROWS = 4;
 const VISIBLE_NEXT_ROWS = 2;
-const TIMER_LENGTH = 180;
 const EMPTY_SPACES_INITIAL_VALUE = [...Array(COLUMNS)].map(() => ([]));
 const PAUSE_BEFORE_COLLAPSE = 200;
 const TIME_BEFORE_SNAP_TO_NEW_STATE = 1000;
@@ -42,7 +41,7 @@ function Play() {
   const [gameInProgress, setGameInProgress] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
   const [countdown, setCountdown] = useState(3);
-  const [timer, setTimer] = useState(TIMER_LENGTH);
+  const [timer, setTimer] = useState();
   const [wordInput, setWordInput] = useState('');
   const [result, setResult] = useState('placeholder text for div height');
   const [resultShowing, setResultShowing] = useState(false);
@@ -120,16 +119,19 @@ function Play() {
     setDialogOpen(false);
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = (time) => {
     setNotStarted(false);
     setTimeout(() => setCountdown(2), 1000);
     setTimeout(() => setCountdown(1), 2000);
     setTimeout(async () => {
       setCountdown(0);
       setGameInProgress(true);
-      timerIntervalId.current = setInterval(() => {
-        setTimer((timer) => timer - 1);
-      }, 1000);
+      setTimer(time);
+      if (time) {
+        timerIntervalId.current = setInterval(() => {
+          setTimer((timer) => timer - 1);
+        }, 1000);
+      }
       gameInstanceRef.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
       if (currentUser) {
         playId.current = await ApiLink.newPlayAtUserStart({ userId: +currentUser.userId });
@@ -141,15 +143,15 @@ function Play() {
     setGameFinished(true);
     setGameInProgress(false);
     clearInterval(timerIntervalId.current);
-    setTimer(null);
     // send update to database
-    if (currentUser) {
+    if (currentUser && timer !== null) {
       const updateInfo = gameInstanceRef.current.getStatsOnGameEnd();
       if (updateInfo) {
         const returnedStats = await ApiLink.updatePlayAtGameOver(playId.current, updateInfo);
         gameInstanceRef.current.setGameOverStats(returnedStats);
       }
     }
+    setTimer(null);
     setDialogOpen(true);
   }
 
@@ -312,15 +314,29 @@ function Play() {
   if (notStarted) {
     return (
       <div className="Play Play-before-start">
-        <Button
-          onClick={handleStartGame}
-          variant="contained"
-          size="large"
-          sx={{
-            background: "linear-gradient(90deg, rgba(9,161,182,1) 0%, rgba(0,212,255,1) 50%, rgba(9,161,182,1) 100%)",
-            borderRadius: "0.5rem"
-          }}
-        >Start Game</Button>
+        <h3>Choose game type:</h3>
+        <div>
+          <Button
+            onClick={() => handleStartGame(180)}
+            variant="contained"
+            size="large"
+            sx={{
+              background: "linear-gradient(90deg, rgba(9,161,182,1) 0%, rgba(0,212,255,1) 50%, rgba(9,161,182,1) 100%)",
+              borderRadius: "0.5rem",
+            }}
+          >3-minute Game</Button>
+        </div>
+        <div>
+          <Button
+            onClick={() => handleStartGame(null)}
+            variant="contained"
+            size="large"
+            sx={{
+              background: "linear-gradient(90deg, rgba(9,161,182,1) 0%, rgba(0,212,255,1) 50%, rgba(9,161,182,1) 100%)",
+              borderRadius: "0.5rem"
+            }}
+          >Free Play</Button>
+        </div>
       </div>
     )
   }
@@ -338,10 +354,12 @@ function Play() {
       <div className="Play">
         <div className="Play-game-info-wrapper">
           <div className="Play-game-info">
-            <div className="Play-timer">
-              <div>Time:&nbsp;</div>
-              <div className="Play-timer-digits">{timeDisplay}</div>
-            </div>
+            {timer &&
+              <div className="Play-timer">
+                <div>Time:&nbsp;</div>
+                <div className="Play-timer-digits">{timeDisplay}</div>
+              </div>
+            }
             <div>Score: {score}</div>
             <div>Current Word: {gameInstanceRef.current.currWordScore}</div>
           </div>
@@ -420,10 +438,10 @@ function Play() {
               <div>Best Word Found: {gameInstanceRef.current.bestWord}</div>
               <div>Best Word Score: {gameInstanceRef.current.bestWordScore}</div>
               <div># of Words Found: {gameInstanceRef.current.numOfWords}</div>
-              <div>Average Word Score: {gameInstanceRef.current.avgWordScore}</div>
+              <div>Average Word Score: {gameInstanceRef.current.avgWordScore || Math.round(score * 100 / gameInstanceRef.current.numOfWords) / 100}</div>
               <div>Longest Word Found: {gameInstanceRef.current.longestWord}</div>
-              <div>Current 10 WMA: {gameInstanceRef.current.curr10Wma}</div>
-              <div>Current 100 WMA: {gameInstanceRef.current.curr100Wma}</div>
+              {gameInstanceRef.current.curr10Wma && <div>Current 10 WMA: {gameInstanceRef.current.curr10Wma}</div>}
+              {gameInstanceRef.current.curr100Wma && <div>Current 100 WMA: {gameInstanceRef.current.curr100Wma}</div>}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
