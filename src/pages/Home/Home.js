@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <div className="Home">
       <BubblesBackground />
-      <p>Play Babblin' Bubbles now!</p>
+      <h3>Play Babblin' Bubbles now!</h3>
       <Button
         className="Home-play-button"
         variant="contained"
