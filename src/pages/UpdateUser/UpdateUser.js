@@ -27,7 +27,7 @@ const UpdateUser = () => {
     email: currentUser.email || '',
     bio: currentUser.bio || '',
     currPassword: ''
-  });
+  }, {bio: 300});
 
   useEffect(() => {
     const getData = async () => {
