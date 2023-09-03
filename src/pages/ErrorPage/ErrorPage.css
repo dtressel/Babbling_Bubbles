@@ -1,0 +1,8 @@
+.ErrorPage {
+  text-align: center;
+}
+
+.ErrorPage-home-button.MuiButton-root {
+  background: var(--error-page-home-button);
+  border-radius: 0.5rem;
+}

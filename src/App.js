@@ -12,11 +12,13 @@ import Strategies from './pages/Strategies';
 import About from './pages/About';
 import ChangePassword from './pages/ChangePassword';
 import UpdateUser from './pages/UpdateUser';
+import ErrorPage from './pages/ErrorPage';
 
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
     loader: null,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
