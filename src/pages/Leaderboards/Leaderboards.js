@@ -27,8 +27,6 @@ const Leaderboards = () => {
       <h1>Top Babblers:</h1>
       {leaderboards && leaderboardOrder.reduce((accum, leaderboardTitle) => {
         if (leaderboards[leaderboardTitle].length) {
-          console.log('columnHeaders', Object.keys(leaderboards[leaderboardTitle][0]));
-          console.log('rows = ', leaderboards[leaderboardTitle].map(row => row.values));
           accum.push(
             <LeaderboardTable
               title={leaderboardTitle}
