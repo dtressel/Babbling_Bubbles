@@ -1,6 +1,6 @@
 # Babbling Bubbles
 
-A word game like Boggle except letters are used up and replaced with new letters like Scrabble.
+A word game like Boggle except letters are used up and replaced with new letters like Scrabble. Deployed live at https://babblin-bubbles.onrender.com/
 
 ## Outside Data:
 
@@ -31,12 +31,9 @@ The only 3rd party used for this game is the dictionary data to check words agai
 - Users can play without logging in, but will have the option to log in to store their stats and high scores.
 - The database will store user and statistical information and the backend will communicate with the database.
 - The complexity of the application in the MVP version (that make it more than just a simple CRUD app), will be centered around the front-end gameplay, animations, and styling.
-## Additional (stretch) Features:
+## Additional Features:
 - Special 2x and 3x bubbles will randomly appear that, when used for a word, will multiply the score for that word by 2 or 3 times. Incorporating multiple special bubbles in a word would result in a compounded bonus. For example, using one 2x and one 3x bubble in a single word would result in the score for that word being multiplied by 6.
 - Like Scrabble, uncommon letter can count for more points than common letters when used.
-- Special fixed games that contain fixed letter choices (I’ll call them “fixed puzzles”) can be added that contain their own high score board. Users at the home page would be able to choose to play random games or fixed games. Fixed games will be predefined games that would result in the same letters appearing each time. I could create something like 100 fixed puzzles. I would create parameters to plug into the letter choosing algorithm to create the fixed letter choices for each fixed puzzle. With fixed puzzles players can compete against each other to try to achieve a high score for that puzzle. This would also create new tables in the database for these fixed puzzles.
-- Instead of fixed puzzles or in addition to regular fixed puzzles there could be daily fixed puzzles similar to how wordle has daily puzzles. The fixed puzzles will only be available on the single day and users can compete to get the highest score for that daily fixed puzzle.
-
 
 # Getting Started with Create React App
 
