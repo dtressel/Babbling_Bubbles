@@ -103,6 +103,10 @@
   font-weight: 600;
 }
 
+.Play-action-icon-button, .Play-submit-button, .Play-letter-bubble {
+  touch-action: manipulation;
+}
+
 .Play-submit-button:hover {
   color: #262626;
 }
