@@ -1,0 +1,26 @@
+.HowToPlay-change-paths-demo {
+  width: 22rem;
+  float: left;
+}
+
+.HowToPlay-tables-container {
+  display: flex;
+}
+
+@media screen and (max-width: 650px) {
+  .HowToPlay-tables-container {
+    display: block;
+  }
+}
+
+.HowToPlay-tables-container th, .HowToPlay-tables-container td, .HowToPlay-tables-container table {
+  border: 1px solid gray;
+}
+
+.HowToPlay-tables-container th, .HowToPlay-tables-container td {
+  padding: .1rem .5rem;
+}
+
+.HowToPlay-tables-container table {
+  margin: 1rem 2rem 1rem 0;
+}
