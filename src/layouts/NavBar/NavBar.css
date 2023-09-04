@@ -73,6 +73,10 @@
   }
 }
 
+.logo-bubble-1, .logo-bubble-2, .logo-bubble-3 {
+  pointer-events: none;
+}
+
 .logo-bubble-1 {
   background-color: var(--);
   left: 0;
