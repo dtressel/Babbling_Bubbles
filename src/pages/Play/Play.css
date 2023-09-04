@@ -225,11 +225,13 @@
 }
 
 .Play-double-bubble {
-  outline: 4px solid rgb(165, 169, 180);
+  outline: 3px solid white;
+  box-shadow: 0 0 10px rgb(255, 255, 126);
 }
 
 .Play-triple-bubble {
-  outline: 4px solid var(--play-triple-bubble);
+  outline: 3px solid var(--play-triple-bubble);
+  box-shadow: 0 0 12px rgb(255, 255, 126), inset 0 0 12px rgb(255, 255, 126);
 }
 
 .Play-empty-bubble-space {

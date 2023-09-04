@@ -13,7 +13,7 @@ const HowToPlay = () => {
         <p>When you find and enter a word from the grid, you get points, and the goal, of course, is to get the higest score possible! In the standard game, you have 3 minutes to find words!</p>      
       </div>
       <h3>Scoring</h3>
-      <p>Each letter has a point value. To calculate the points won for each word found, Babbling Bubbles first adds the point value for each letter. Then, word length bonusses get added. The longer the word, the bigger the bonus! Finally, if you use a special multiplier bubble, the total score will be multiplied by the multiplier. Bubbles bordered with a thin orange border are 2x multipliers. Bubbles bordered with a thick gold border are 3x multipliers. If you use several multipliers for a single word, the multipliers compound! For example, if you use one 2x multiplier and two 3x multipliers in a single word, the word score will be multiplied by 18!!</p>
+      <p>Each letter has a point value. To calculate the points won for each word found, Babbling Bubbles first adds the point value for each letter. Then, word length bonusses get added. The longer the word, the bigger the bonus! Finally, if you use a special multiplier bubble, the total score will be multiplied by the multiplier. Bubbles bordered with a white border are 2x multipliers. Bubbles bordered with a gold border are 3x multipliers. If you use several multipliers for a single word, the multipliers compound! For example, if you use one 2x multiplier and two 3x multipliers in a single word, the word score will be multiplied by 18!!</p>
       <div className="HowToPlay-tables-container">
         <table>
           <tr>
