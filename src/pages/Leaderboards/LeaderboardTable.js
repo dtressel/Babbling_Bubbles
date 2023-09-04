@@ -46,9 +46,9 @@ const LeaderboardTable = ({ title, columnHeaders, rows }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {rows.map((row, idx) => (
               <TableRow
-                key={`row-${row[0]}`}
+                key={`row-${row[0]}-${idx}`}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 {row.map((cellValue, idx) => (
