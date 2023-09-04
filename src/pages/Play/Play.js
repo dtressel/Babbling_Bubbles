@@ -50,6 +50,7 @@ function Play() {
   const [popCollapse, setPopCollapse] = useState(false);
   const [score, setScore] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [freePlay, setFreePlay] = useState(false);
 
   const { currentUser } = useContext(UserContext);
 
@@ -128,9 +129,13 @@ function Play() {
       setGameInProgress(true);
       setTimer(time);
       if (time) {
+        setFreePlay(false);
         timerIntervalId.current = setInterval(() => {
           setTimer((timer) => timer - 1);
         }, 1000);
+      } 
+      else {
+        setFreePlay(true);
       }
       gameInstanceRef.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
       if (currentUser) {
@@ -143,15 +148,15 @@ function Play() {
     setGameFinished(true);
     setGameInProgress(false);
     clearInterval(timerIntervalId.current);
+    setTimer(null);
     // send update to database
-    if (currentUser && timer !== null) {
+    if (currentUser && !freePlay) {
       const updateInfo = gameInstanceRef.current.getStatsOnGameEnd();
       if (updateInfo) {
         const returnedStats = await ApiLink.updatePlayAtGameOver(playId.current, updateInfo);
         gameInstanceRef.current.setGameOverStats(returnedStats);
       }
     }
-    setTimer(null);
     setDialogOpen(true);
   }
 
