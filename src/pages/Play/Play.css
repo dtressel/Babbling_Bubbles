@@ -103,7 +103,7 @@
   font-weight: 600;
 }
 
-.Play-action-icon-button, .Play-submit-button, .Play-letter-bubble {
+.Play {
   touch-action: manipulation;
 }
 
