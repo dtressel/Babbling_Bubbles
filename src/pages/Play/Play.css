@@ -103,10 +103,6 @@
   font-weight: 600;
 }
 
-.Play {
-  touch-action: manipulation;
-}
-
 .Play-submit-button:hover {
   color: #262626;
 }
