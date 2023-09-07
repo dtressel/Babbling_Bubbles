@@ -104,7 +104,6 @@ function Play() {
         gameInstanceRef.current.findNewPathCurrWordScore();
         return newPrimaryPathIndex;
       });
-      gameInstanceRef.current.calcCurrWordScore(wordInput);
     }
   }
 
