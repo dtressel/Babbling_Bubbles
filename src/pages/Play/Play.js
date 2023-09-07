@@ -426,7 +426,16 @@ function Play() {
           secondaryPaths={gameInstanceRef.current.secondaryPaths}
           emptySpaces={emptySpaces}
         />
-        <Button component="button" href={"/play"}>Play Again</Button>
+        <Button
+          variant="contained"
+          size="large"
+          sx={{
+            background: "linear-gradient(90deg, rgba(9,161,182,1) 0%, rgba(0,212,255,1) 50%, rgba(9,161,182,1) 100%)",
+            borderRadius: "0.5rem",
+            }}
+          component="button"
+          href={"/play"}
+        >Play Again</Button>
         <Dialog
           open={dialogOpen}
           TransitionComponent={Transition}
