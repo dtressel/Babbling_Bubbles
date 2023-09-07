@@ -426,6 +426,7 @@ function Play() {
           secondaryPaths={gameInstanceRef.current.secondaryPaths}
           emptySpaces={emptySpaces}
         />
+        <Button component="button" href={"/play"}>Play Again</Button>
         <Dialog
           open={dialogOpen}
           TransitionComponent={Transition}
