@@ -69,14 +69,14 @@ class ApiLink {
     Create new play at user start of single game 
     newPlayData: { userId, gameType(optional), gameId(optional) }
   */
-  static async newPlayAtUserStart(newPlayData) {
+  static async startSoloGame(newPlayData) {
     console.log(newPlayData);
     const data = await this.request(`plays`, newPlayData, "post");
     return data.playId;
   }
 
   /* Update data for finished play */
-  static async updatePlayAtGameOver(playId, updateInfo) {
+  static async updateSoloGame(playId, updateInfo) {
     const data = await this.request(`plays/${playId}`, updateInfo, "patch");
     return data.stats;
   }
