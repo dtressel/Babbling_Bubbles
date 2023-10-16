@@ -69,28 +69,27 @@ class ApiLink {
     Create new play at user start of single game 
     newPlayData: { userId, gameType(optional), gameId(optional) }
   */
-  static async startSoloGame(newPlayData) {
-    console.log(newPlayData);
-    const data = await this.request(`plays`, newPlayData, "post");
-    return data.playId;
+  static async startSoloPlay(userId, gameType) {
+    const data = await this.request(`solo-plays/${userId}`, { gameType }, "post");
+    return data.playData;
   }
 
   /* Update data for finished play */
-  static async updateSoloGame(playId, updateInfo) {
-    const data = await this.request(`plays/${playId}`, updateInfo, "patch");
+  static async updateSoloPlay(playId, updateInfo) {
+    const data = await this.request(`solo-plays/${playId}`, updateInfo, "patch");
     return data.stats;
   }
 
   /* Get leaderboard data */
-  static async getLeaderboards() {
-    const data = await this.request('leaderboards');
+  static async getLeaderboards(gameType) {
+    const data = await this.request('leaderboards', { gameTypes: gameType });
     return data.leaderboards;
   }
 
   /* Get more stats for user */
   static async getMoreStats(userId) {
-    const data = await this.request(`users/${userId}/more-stats`);
-    return data.stats;
+    const data = await this.request(`users/${userId}/profile-data`);
+    return data;
   }
 }
 

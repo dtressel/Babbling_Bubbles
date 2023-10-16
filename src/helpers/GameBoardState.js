@@ -24,15 +24,12 @@ class GameBoardState {
     this.currentBoard = this.createNewBoard();
     this.score = 0;
     this.numOfWords = 0;
-    this.bestWord = null;
-    this.bestWordScore = 0;
-    this.bestWordBoardState = null;
-    this.craziestWord = null;
-    this.craziestWordScore = 0;
-    this.craziestWordBoardState = null;
-    this.longestWord = null;
-    this.longestWordScore = 0;
-    this.longestWordBoardState = null;
+    // [ { bestType, word, score, boardState }, ... ]
+    this.bestWords = [];
+    this.bstWordScoreBar = { thisGameBest: 0, allTimeTenthBest: 0 };
+    this.crzWordScoreBar = { thisGameBest: 0, allTimeTenthBest: 0 };
+    this.lngWordScoreBar = { thisGameBest: 0, allTimeTenthBest: 0 };
+    this.tenBestWords = null;
     this.currWordScore = 0;
     this.currPathMultiplier = 1;
     /* 
@@ -80,9 +77,15 @@ class GameBoardState {
     // To be set on game end
     this.avgWordScore = null;
     this.curr100Wma = null;
-    this.curr10Wma = null;
+    this.curr20Wma = null;
     this.isPeak100Wma = null;
-    this.isPeak10Wma = null;
+    this.isPeak20Wma = null;
+    this.ttlScorePlace = null;
+    this.avgScorePlace = null;
+    this.finalBstWord = {};
+    // { word, score }
+    this.finalLngWord = '';
+    this.finalCrzWord = '';
   }
   
   // creates an array of arrays, each inner array represents a column on the game board
@@ -495,33 +498,76 @@ class GameBoardState {
     }
     // add number of letters bonus
     wordScorePreMult += GameBoardState.numOfLettersBonus[word.length];
+
     // see if this is the craziest word so far, if so, update instance
-    if (wordScorePreMult > this.craziestWordScore) {
-      this.craziestWord = word;
-      this.craziestWordScore = wordScorePreMult;
+    if (wordScorePreMult > this.crzWordScoreBar.thisGameBest) {
+      this.crzWordScoreBar.thisGameBest = wordScorePreMult;
       currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.craziestWordBoardState = currBoardString;
+      this.bestWords.push({
+        bestType: 'crz',
+        word,
+        score: wordScorePreMult,
+        boardState: currBoardString
+      });
     }
+    else if (wordScorePreMult > this.crzWordScoreBar.allTimeTenthBest) {
+      currBoardString = this.convertCurrBoardToString(primaryPath);
+      this.bestWords.push({
+        bestType: 'crz',
+        word,
+        score: wordScorePreMult,
+        boardState: currBoardString
+      });
+    }
+
     // see if this is the longest word so far, if so, update instance
     const currWordLongestWordScore = (word.length * 1000) + wordScorePreMult;
-    if (currWordLongestWordScore > this.longestWordScore) {
-      this.longestWord = word;
-      this.longestWordScore = currWordLongestWordScore;
+    if (currWordLongestWordScore > this.lngWordScoreBar.thisGameBest) {
+      this.lngWordScoreBar.thisGameBest = currWordLongestWordScore;
       if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.longestWordBoardState = currBoardString;  
+      this.bestWords.push({
+        bestType: 'lng',
+        word,
+        score: currWordLongestWordScore,
+        boardState: currBoardString
+      });
     }
+    else if (currWordLongestWordScore > this.lngWordScoreBar.allTimeTenthBest) {
+      if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
+      this.bestWords.push({
+        bestType: 'lng',
+        word,
+        score: currWordLongestWordScore,
+        boardState: currBoardString
+      });
+    }
+
     // check if multiplier bubbles used, if so, multiply by multiplier
     let multiplier = 1;
     for (const bubble of primaryPath) {
       multiplier *= this.currentBoard[bubble[0]][bubble[1]].length;
     }
     let wordScore = wordScorePreMult * multiplier;
+
     // see if this is the best word so far, if so, update instance
-    if (wordScore > this.bestWordScore) {
-      this.bestWordScore = wordScore;
-      this.bestWord = word;
+    if (wordScore > this.bstWordScoreBar.thisGameBest) {
+      this.bstWordScoreBar.thisGameBest = wordScore;
       if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.bestWordBoardState = currBoardString;
+      this.bestWords.push({
+        bestType: 'bst',
+        word,
+        score: wordScore,
+        boardState: currBoardString
+      });
+    }
+    else if (wordScore > this.bstWordScoreBar.allTimeTenthBest) {
+      if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
+      this.bestWords.push({
+        bestType: 'bst',
+        word,
+        score: wordScore,
+        boardState: currBoardString
+      });
     }
   
     return wordScore;    
@@ -571,31 +617,69 @@ class GameBoardState {
   getStatsOnGameEnd() {
     this.gameActive = false;
     // if no words were found, short circuit
-    if (!this.score) return null;
+    if (!this.score) return {};
+    // trim bestWords array
+    const bestWordsForUpdate = this.bestWords.filter((wordObj) => {
+      return wordObj.score > this[`${wordObj.bestType}WordScoreBar`].allTimeTenthBest;
+    });
     // otherwise, create stats object
-    const baseInfoCategories = ["score", "numOfWords", "bestWord", "bestWordScore",
-                                "bestWordBoardState"];
-    const extraStatsCategories = ["craziestWord", "craziestWordScore", "bestWordBoardState",
-                                  "longestWord", "longestWordScore", "longestWodBoardState"];
-    const baseInfo = baseInfoCategories.reduce((accum, curr) => {
+    const statKeys = ['score', 'numOfWords'];
+    const stats = statKeys.reduce((accum, curr) => {
       if (this[curr]) accum[curr] = this[curr];
       return accum;
     }, {});
-    const extraStats = extraStatsCategories.reduce((accum, curr) => {
-      if (this[curr]) accum[curr] = this[curr];
-      return accum;
-    }, {});
+    stats.bestWords = bestWordsForUpdate;
 
-    return { baseInfo, extraStats };
+    return stats;
   }
 
   /* Sets the stats collected from backend on game over to game instance */
   setGameOverStats(returnedStats) {
     this.avgWordScore = returnedStats.avgWordScore;
     this.curr100Wma = returnedStats.curr100Wma;
-    this.curr10Wma = returnedStats.curr10Wma;
+    this.curr20Wma = returnedStats.curr20Wma;
     this.isPeak100Wma = returnedStats.isPeak100Wma;
-    this.isPeak10Wma = returnedStats.isPeak10Wma;
+    this.isPeak20Wma = returnedStats.isPeak20Wma;
+    this.ttlScorePlace = returnedStats.ttlScorePlace;
+    this.avgScorePlace = returnedStats.avgScorePlace;
+
+    // find best word
+    const bstWords = this.bestWords.filter((wordObj) => {
+      return wordObj.bestType === 'bst';
+    });
+    console.log(bstWords);
+    const bstWordScore = Math.max(...bstWords.map((wordObj) => {
+      return wordObj.score;
+    }));
+    console.log(bstWordScore);
+    const bstWord = bstWords.filter((wordObj) => {
+      return wordObj.score === bstWordScore;
+    })[0].word;
+    this.finalBstWord = { word: bstWord, score: bstWordScore };
+
+    // find longest word
+    const lngWords = this.bestWords.filter((wordObj) => {
+      return wordObj.bestType === 'lng';
+    });
+    const lngWordScore = Math.max(...lngWords.map((wordObj) => {
+      return wordObj.score;
+    }));
+    const lngWord = lngWords.filter((wordObj) => {
+      return wordObj.score === lngWordScore;
+    })[0].word;
+    this.finalLngWord = lngWord;
+
+    // find longest word
+    const crzWords = this.bestWords.filter((wordObj) => {
+      return wordObj.bestType === 'crz';
+    });
+    const crzWordScore = Math.max(...crzWords.map((wordObj) => {
+      return wordObj.score;
+    }));
+    const crzWord = crzWords.filter((wordObj) => {
+      return wordObj.score === crzWordScore;
+    })[0].word;
+    this.finalCrzWord = crzWord;
   }
 
   static letterValues = { a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1,

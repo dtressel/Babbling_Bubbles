@@ -31,6 +31,18 @@ const VISIBLE_NEXT_ROWS = 2;
 const EMPTY_SPACES_INITIAL_VALUE = [...Array(COLUMNS)].map(() => ([]));
 const PAUSE_BEFORE_COLLAPSE = 200;
 const TIME_BEFORE_SNAP_TO_NEW_STATE = 1000;
+const places = {
+  1: "best ever",
+  2: "2nd best",
+  3: "3rd best",
+  4: "4th best",
+  5: "5th best",
+  6: "6th best",
+  7: "7th best",
+  8: "8th best",
+  9: "9th best",
+  10: "10th best"
+}
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -50,7 +62,7 @@ function Play() {
   const [popCollapse, setPopCollapse] = useState(false);
   const [score, setScore] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [freePlay, setFreePlay] = useState(false);
+  const [gameType, setGameType] = useState('');
 
   const { currentUser } = useContext(UserContext);
 
@@ -127,18 +139,24 @@ function Play() {
       setCountdown(0);
       setGameInProgress(true);
       setTimer(time);
+      const selectedGameType = `solo${time / 60}`;
       if (time) {
-        setFreePlay(false);
+        setGameType(selectedGameType);
         timerIntervalId.current = setInterval(() => {
           setTimer((timer) => timer - 1);
         }, 1000);
-      } 
+      }
       else {
-        setFreePlay(true);
+        setGameType('free');
       }
       gameInstanceRef.current = new GameBoardState(COLUMNS, ROWS, VISIBLE_NEXT_ROWS);
       if (currentUser) {
-        playId.current = await ApiLink.newPlayAtUserStart({ userId: +currentUser.userId });
+        const playData = await ApiLink.startSoloPlay(+currentUser.userId, selectedGameType);
+        playId.current = playData.playId;
+        gameInstanceRef.current.bstWordScoreBar.AllTimeTenthBest = playData.bstWordScoreBar ?? 0;
+        gameInstanceRef.current.crzWordScoreBar.AllTimeTenthBest = playData.crzWordScoreBar ?? 0;
+        gameInstanceRef.current.lngWordScoreBar.AllTimeTenthBest = playData.lngWordScoreBar ?? 0;
+        gameInstanceRef.current.tenBestWords = playData.tenBestWords ?? null;
       }
     }, 3000);
   }
@@ -149,10 +167,10 @@ function Play() {
     clearInterval(timerIntervalId.current);
     setTimer(null);
     // send update to database
-    if (currentUser && !freePlay) {
+    if (currentUser && gameType !== 'free') {
       const updateInfo = gameInstanceRef.current.getStatsOnGameEnd();
       if (updateInfo) {
-        const returnedStats = await ApiLink.updatePlayAtGameOver(playId.current, updateInfo);
+        const returnedStats = await ApiLink.updateSoloPlay(playId.current, updateInfo);
         gameInstanceRef.current.setGameOverStats(returnedStats);
       }
     }
@@ -332,6 +350,17 @@ function Play() {
         </div>
         <div>
           <Button
+            onClick={() => handleStartGame(600)}
+            variant="contained"
+            size="large"
+            sx={{
+              background: "linear-gradient(90deg, rgba(9,161,182,1) 0%, rgba(0,212,255,1) 50%, rgba(9,161,182,1) 100%)",
+              borderRadius: "0.5rem",
+            }}
+          >10-minute Game</Button>
+        </div>
+        <div>
+          <Button
             onClick={() => handleStartGame(null)}
             variant="contained"
             size="large"
@@ -449,13 +478,18 @@ function Play() {
                 <div>Final Score:</div>
                 <div>{score}</div>
               </div>
-              <div>Best Word Found: {gameInstanceRef.current.bestWord}</div>
-              <div>Best Word Score: {gameInstanceRef.current.bestWordScore}</div>
+              {gameInstanceRef.current.ttlScorePlace && <div>This is your {places[gameInstanceRef.current.ttlScorePlace]} score!</div>}
+              <div>Best Word Found: {gameInstanceRef.current.finalBstWord.word}</div>
+              <div>Best Word Score: {gameInstanceRef.current.finalBstWord.score}</div>
               <div># of Words Found: {gameInstanceRef.current.numOfWords}</div>
               <div>Average Word Score: {gameInstanceRef.current.avgWordScore || Math.round(score * 100 / gameInstanceRef.current.numOfWords) / 100}</div>
-              <div>Longest Word Found: {gameInstanceRef.current.longestWord}</div>
-              {gameInstanceRef.current.curr10Wma && <div>Current 10 WMA: {gameInstanceRef.current.curr10Wma}</div>}
-              {gameInstanceRef.current.curr100Wma && <div>Current 100 WMA: {gameInstanceRef.current.curr100Wma}</div>}
+              {gameInstanceRef.current.avgScorePlace && <div>This is your {places[gameInstanceRef.current.avgScorePlace]} average word score!</div>}
+              <div>Longest Word Found: {gameInstanceRef.current.finalLngWord}</div>
+              <div>Craziest Word Found: {gameInstanceRef.current.finalCrzWord}</div>
+              {gameInstanceRef.current.curr20Wma && <div>20-Game WMA: {gameInstanceRef.current.curr20Wma}</div>}
+              {gameInstanceRef.current.isPeak20Wma && <div>You have acheived your best 20-Game WMA ever!</div>}
+              {gameInstanceRef.current.curr100Wma && <div>100-Game WMA: {gameInstanceRef.current.curr100Wma}</div>}
+              {gameInstanceRef.current.isPeak100Wma && <div>You have acheived your best 100-Game WMA ever!</div>}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
