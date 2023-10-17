@@ -25,7 +25,9 @@ class GameBoardState {
     this.score = 0;
     this.numOfWords = 0;
     // [ { bestType, word, score, boardState }, ... ]
-    this.bestWords = [];
+    this.bstWords = [];
+    this.crzWords = [];
+    this.lngWords = [];
     this.bstWordScoreBar = { thisGameBest: 0, allTimeTenthBest: 0 };
     this.crzWordScoreBar = { thisGameBest: 0, allTimeTenthBest: 0 };
     this.lngWordScoreBar = { thisGameBest: 0, allTimeTenthBest: 0 };
@@ -503,7 +505,7 @@ class GameBoardState {
     if (wordScorePreMult > this.crzWordScoreBar.thisGameBest) {
       this.crzWordScoreBar.thisGameBest = wordScorePreMult;
       currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.bestWords.push({
+      this.crzWords.push({
         bestType: 'crz',
         word,
         score: wordScorePreMult,
@@ -512,7 +514,7 @@ class GameBoardState {
     }
     else if (wordScorePreMult > this.crzWordScoreBar.allTimeTenthBest) {
       currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.bestWords.push({
+      this.crzWords.push({
         bestType: 'crz',
         word,
         score: wordScorePreMult,
@@ -525,7 +527,7 @@ class GameBoardState {
     if (currWordLongestWordScore > this.lngWordScoreBar.thisGameBest) {
       this.lngWordScoreBar.thisGameBest = currWordLongestWordScore;
       if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.bestWords.push({
+      this.lngWords.push({
         bestType: 'lng',
         word,
         score: currWordLongestWordScore,
@@ -534,7 +536,7 @@ class GameBoardState {
     }
     else if (currWordLongestWordScore > this.lngWordScoreBar.allTimeTenthBest) {
       if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.bestWords.push({
+      this.lngWords.push({
         bestType: 'lng',
         word,
         score: currWordLongestWordScore,
@@ -553,7 +555,7 @@ class GameBoardState {
     if (wordScore > this.bstWordScoreBar.thisGameBest) {
       this.bstWordScoreBar.thisGameBest = wordScore;
       if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.bestWords.push({
+      this.bstWords.push({
         bestType: 'bst',
         word,
         score: wordScore,
@@ -562,7 +564,7 @@ class GameBoardState {
     }
     else if (wordScore > this.bstWordScoreBar.allTimeTenthBest) {
       if (!currBoardString) currBoardString = this.convertCurrBoardToString(primaryPath);
-      this.bestWords.push({
+      this.bstWords.push({
         bestType: 'bst',
         word,
         score: wordScore,
@@ -613,22 +615,35 @@ class GameBoardState {
     return boardStateString;
   }
 
-  /* Collects stats to send to API */
+  /* Collects stats to send to API **************************************************************************************************************/
   getStatsOnGameEnd() {
     this.gameActive = false;
     // if no words were found, short circuit
     if (!this.score) return {};
-    // trim bestWords array
-    const bestWordsForUpdate = this.bestWords.filter((wordObj) => {
-      return wordObj.score > this[`${wordObj.bestType}WordScoreBar`].allTimeTenthBest;
+
+    // sort and then trim best words arrays
+    this.bstWords.sort((a, b) => a.score - b.score);
+    const bstWordsForUpdate = this.bstWords.filter((wordObj, idx) => {
+      return wordObj.score > this.bstWordScoreBar.allTimeTenthBest && idx < 10;
     });
+
+    this.crzWords.sort((a, b) => a.score - b.score);
+    const crzWordsForUpdate = this.crzWords.filter((wordObj, idx) => {
+      return wordObj.score > this.crzWordScoreBar.allTimeTenthBest && idx < 10;
+    });
+
+    this.lngWords.sort((a, b) => a.score - b.score);
+    const lngWordsForUpdate = this.lngWords.filter((wordObj, idx) => {
+      return wordObj.score > this.lngWordScoreBar.allTimeTenthBest && idx < 10;
+    });
+
     // otherwise, create stats object
     const statKeys = ['score', 'numOfWords'];
     const stats = statKeys.reduce((accum, curr) => {
       if (this[curr]) accum[curr] = this[curr];
       return accum;
     }, {});
-    stats.bestWords = bestWordsForUpdate;
+    stats.bestWords = [...bstWordsForUpdate, ...crzWordsForUpdate, ...lngWordsForUpdate];
 
     return stats;
   }
@@ -642,44 +657,10 @@ class GameBoardState {
     this.isPeak20Wma = returnedStats.isPeak20Wma;
     this.ttlScorePlace = returnedStats.ttlScorePlace;
     this.avgScorePlace = returnedStats.avgScorePlace;
-
-    // find best word
-    const bstWords = this.bestWords.filter((wordObj) => {
-      return wordObj.bestType === 'bst';
-    });
-    console.log(bstWords);
-    const bstWordScore = Math.max(...bstWords.map((wordObj) => {
-      return wordObj.score;
-    }));
-    console.log(bstWordScore);
-    const bstWord = bstWords.filter((wordObj) => {
-      return wordObj.score === bstWordScore;
-    })[0].word;
-    this.finalBstWord = { word: bstWord, score: bstWordScore };
-
-    // find longest word
-    const lngWords = this.bestWords.filter((wordObj) => {
-      return wordObj.bestType === 'lng';
-    });
-    const lngWordScore = Math.max(...lngWords.map((wordObj) => {
-      return wordObj.score;
-    }));
-    const lngWord = lngWords.filter((wordObj) => {
-      return wordObj.score === lngWordScore;
-    })[0].word;
-    this.finalLngWord = lngWord;
-
-    // find longest word
-    const crzWords = this.bestWords.filter((wordObj) => {
-      return wordObj.bestType === 'crz';
-    });
-    const crzWordScore = Math.max(...crzWords.map((wordObj) => {
-      return wordObj.score;
-    }));
-    const crzWord = crzWords.filter((wordObj) => {
-      return wordObj.score === crzWordScore;
-    })[0].word;
-    this.finalCrzWord = crzWord;
+    // final bst, lng, and crz word arrays already sorted in getStatsOnGameEnd()
+    this.finalBstWord = { word: this.bstWords[0].word, score: this.bstWords[0].score };
+    this.finalLngWord = { word: this.lngWords[0].word, score: this.lngWords[0].score };
+    this.finalCrzWord = { word: this.crzWords[0].word, score: this.crzWords[0].score };
   }
 
   static letterValues = { a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1,
