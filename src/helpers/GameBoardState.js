@@ -84,7 +84,7 @@ class GameBoardState {
     this.isPeak20Wma = null;
     this.ttlScorePlace = null;
     this.avgScorePlace = null;
-    this.finalBstWord = {};
+    this.finalBstWord = null;
     // { word, score }
     this.finalLngWord = '';
     this.finalCrzWord = '';
@@ -615,24 +615,37 @@ class GameBoardState {
     return boardStateString;
   }
 
-  /* Collects stats to send to API **************************************************************************************************************/
+  /*
+    Collects stats to send to API
+    Creates the following stas object:
+    {
+      score: <int>,
+      numOfWords: <int>,
+      bestWords: {
+        bst: [{ bestType, word, score, boardState }, { ... }],
+        crz: [...],
+        lng: [...]
+      }
+    }
+    bestWords may or may not be present in object
+  */
   getStatsOnGameEnd() {
     this.gameActive = false;
     // if no words were found, short circuit
-    if (!this.score) return {};
+    if (!this.score) return { score: 0, numOfWords: 0 };
 
     // sort and then trim best words arrays
-    this.bstWords.sort((a, b) => a.score - b.score);
+    this.bstWords.sort((a, b) => b.score - a.score);
     const bstWordsForUpdate = this.bstWords.filter((wordObj, idx) => {
       return wordObj.score > this.bstWordScoreBar.allTimeTenthBest && idx < 10;
     });
 
-    this.crzWords.sort((a, b) => a.score - b.score);
+    this.crzWords.sort((a, b) => b.score - a.score);
     const crzWordsForUpdate = this.crzWords.filter((wordObj, idx) => {
       return wordObj.score > this.crzWordScoreBar.allTimeTenthBest && idx < 10;
     });
 
-    this.lngWords.sort((a, b) => a.score - b.score);
+    this.lngWords.sort((a, b) => b.score - a.score);
     const lngWordsForUpdate = this.lngWords.filter((wordObj, idx) => {
       return wordObj.score > this.lngWordScoreBar.allTimeTenthBest && idx < 10;
     });
@@ -643,7 +656,11 @@ class GameBoardState {
       if (this[curr]) accum[curr] = this[curr];
       return accum;
     }, {});
-    stats.bestWords = [...bstWordsForUpdate, ...crzWordsForUpdate, ...lngWordsForUpdate];
+
+    // only add bestWords to stats object if there are best words to add to database
+    if (bstWordsForUpdate.length || crzWordsForUpdate.length || lngWordsForUpdate.length) {
+      stats.bestWords = { bst: bstWordsForUpdate, crz: crzWordsForUpdate, lng: lngWordsForUpdate };
+    }
 
     return stats;
   }
@@ -658,9 +675,15 @@ class GameBoardState {
     this.ttlScorePlace = returnedStats.ttlScorePlace;
     this.avgScorePlace = returnedStats.avgScorePlace;
     // final bst, lng, and crz word arrays already sorted in getStatsOnGameEnd()
-    this.finalBstWord = { word: this.bstWords[0].word, score: this.bstWords[0].score };
-    this.finalLngWord = { word: this.lngWords[0].word, score: this.lngWords[0].score };
-    this.finalCrzWord = { word: this.crzWords[0].word, score: this.crzWords[0].score };
+    if (this.bstWords.length) {
+      this.finalBstWord = { word: this.bstWords[0].word, score: this.bstWords[0].score };
+    }
+    if (this.lngWords.length) {
+      this.finalLngWord = this.lngWords[0].word;
+    }
+    if (this.crzWords.length) {
+      this.finalCrzWord = this.crzWords[0].word;
+    }
   }
 
   static letterValues = { a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1,
