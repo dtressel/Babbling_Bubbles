@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -5,35 +6,64 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import './Leaderboards.css';
 
 const tableAndColumnTitleKey = {
-  bestAvgWordScoreMin15: "Single Game Highest Average Word Score",
-  bestAvgWordScore: "Single Game Highest Average Word Score",
-  bestCurrent100Wma: "Highest Current 100 WMA",
-  bestCurrent10Wma: "Highest Current 10 WMA",
-  bestPeak100Wma: "Highest Peak 100 WMA",
-  bestPeak10Wma: "Highest Peak 10 WMA",
-  bestPlayScoresSingle: "Single Game High Score",
-  bestWordScores: "Single Word Highest Score",
-  username: "Username",
-  avgWordScore: "Avg",
+  avgScore: "Single Game Average Word Score",
   curr100Wma: "Current 100 WMA",
-  curr10Wma: "Current 10 WMA",
+  curr20Wma: "Current 20 WMA",
   peak100Wma: "Peak 100 WMA",
-  peak10Wma: "Peak 10 WMA",
+  peak20Wma: "Peak 20 WMA",
+  ttlScore: "Single Game High Score",
+  lngWord: "Longest Word",
+  bstWord: "Highest Word Score",
+  crzWord: "Craziest Word",
   score: "Score",
-  bestWord: "Word",
   bestWordScore: "Score",
-  date: "Date"
+  date: "Date",
+  word: "Word",
+  username: "User"
 }
 
 /* columnHeaders is an array, data is an array (for each row) of arrays (2nd level array contains data for each cell) */
-const LeaderboardTable = ({ title, columnHeaders, rows }) => {
+const LeaderboardTable = ({ title, data }) => {
+  const [gameType, setGameType] = useState(() => {
+    if (data.solo3?.length) return 'solo3';
+    if (data.solo10?.length) return 'solo10';
+    else return 'free';
+  });
+
+  const handleChange = (event) => {
+    setGameType(event.target.value);
+  };
+  // get columnHeaders from data object, without boardState
+  const columnHeaders = Object.keys(data[gameType][0]).filter((header) => {
+    return header !== 'boardState';
+  });
+  // get row data in an array format from data object, without boardState
+  const rows = data[gameType].map(row => {
+    const { boardState, ...rowNoBoardState } = row;
+    return Object.values(rowNoBoardState);
+  });
 
   return (
     <div>
       <h3>{tableAndColumnTitleKey[title]}</h3>
+      <div>
+        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+          <Select
+            value={gameType}
+            onChange={handleChange}
+          >
+            {data.solo3?.length && <MenuItem value='solo3'>3-minute</MenuItem>}
+            {data.solo10?.length && <MenuItem value='solo10'>10-minute</MenuItem>}
+            {data.free?.length && <MenuItem value='free'>Free play</MenuItem>}
+          </Select>
+        </FormControl>
+      </div>
       <TableContainer component={Paper} className="Leaderboards-table-container">
         <Table size="small" aria-label="a dense table">
           <TableHead>

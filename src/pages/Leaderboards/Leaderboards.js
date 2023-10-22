@@ -3,13 +3,15 @@ import ApiLink from "../../helpers/ApiLink";
 import LeaderboardTable from './LeaderboardTable';
 
 const leaderboardOrder = [
-  "bestPlayScoresSingle",
-  "bestWordScores",
-  "bestAvgWordScoreMin15",
-  "bestCurrent100Wma",
-  "bestCurrent10Wma",
-  "bestPeak100Wma",
-  "bestPeak10Wma"
+  "ttlScore",
+  "avgScore",
+  "curr20Wma",
+  "curr100Wma",
+  "peak20Wma",
+  "peak100Wma",
+  "bstWord",
+  "lngWord",
+  "crzWord"
 ];
 
 const Leaderboards = () => {
@@ -21,17 +23,17 @@ const Leaderboards = () => {
     }
     getLeaderboardData();
   }, []);
+  console.log(leaderboards);
 
   return (
     <>
       <h1>Top Babblers:</h1>
       {leaderboards && leaderboardOrder.reduce((accum, leaderboardTitle) => {
-        if (leaderboards[leaderboardTitle].length) {
+        if (leaderboards[leaderboardTitle]?.solo3.length || leaderboards[leaderboardTitle]?.solo10.length || leaderboards[leaderboardTitle]?.free.length) {
           accum.push(
             <LeaderboardTable
               title={leaderboardTitle}
-              columnHeaders={Object.keys(leaderboards[leaderboardTitle][0])}
-              rows={leaderboards[leaderboardTitle].map(row => Object.values(row))}
+              data={leaderboards[leaderboardTitle]}
               key={leaderboardTitle}
             />
           );
