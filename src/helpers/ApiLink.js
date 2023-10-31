@@ -87,8 +87,14 @@ class ApiLink {
   }
 
   /* Get more stats for user */
-  static async getMoreStats(userId) {
+  static async getProfileData(userId) {
     const data = await this.request(`users/${userId}/profile-data`);
+    return data;
+  }
+
+  /* Get more stats for user */
+  static async getProfileDataByUsername(username) {
+    const data = await this.request(`users/${username}/profile-data-by-username`);
     return data;
   }
 }
