@@ -15,7 +15,7 @@ class ApiLink {
   static token = null;
 
   static async request(endpoint, data = {}, method = "get") {
-    console.debug("API Call:", endpoint, data, method);
+    // console.debug("API Call:", endpoint, data, method);
 
     //there are multiple ways to pass an authorization token, this is how you pass it in the header.
     const url = `${BASE_URL}/${endpoint}`;

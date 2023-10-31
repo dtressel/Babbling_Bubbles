@@ -23,7 +23,6 @@ const Leaderboards = () => {
     }
     getLeaderboardData();
   }, []);
-  console.log(leaderboards);
 
   return (
     <>
