@@ -20,7 +20,6 @@ const UpdateUser = () => {
   const [alertMessages, setAlertMessages] = useState();
 
   const { currentUser, setAdditionalInfo, updateUserInfo } = useContext(UserContext);
-  console.log(currentUser);
 
   const { formData, handleFieldChange, setFields, resetFormData } = useFields({
     country: currentUser.country,
@@ -38,7 +37,7 @@ const UpdateUser = () => {
       }
     }
     getData();
-  }, [currentUser.userId, currentUser.bio, setAdditionalInfo, setFields]);
+  }, [currentUser.userId, currentUser.bio, setAdditionalInfo]);
 
   const handleSubmit = async evt => {
     evt.preventDefault();
