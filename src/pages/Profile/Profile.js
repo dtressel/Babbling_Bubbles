@@ -81,87 +81,105 @@ const Profile = () => {
                 </div>
               }
               <div className="Profile-stats Profile-section">
-                <div>Stats:</div>
-                <div>
-                  <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                    <Select
-                      value={gameType}
-                      onChange={handleChange}
-                    >
-                      {gameTypeChoices.current.map((gameType) => {
-                        return <MenuItem value={gameType} key={gameType}>{gameTypeKey[gameType]}</MenuItem>
-                      })}
-                    </Select>
-                  </FormControl>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>High Score</div>
-                  <div>{profileData.leaderboards.ttlScore[gameType][0].score}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Current 20-Day WMA</div>
-                  <div>{profileData.stats[gameType].curr20Wma}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Peak 20-Day WMA</div>
-                  <div>{profileData.stats[gameType].peak20Wma}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Date Acheived</div>
-                  <div>{profileData.stats[gameType].peak20WmaDate}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Current 100-Day WMA</div>
-                  <div>{profileData.stats[gameType].curr100Wma}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Peak 100-Day WMA</div>
-                  <div>{profileData.stats[gameType].peak100Wma}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Date Acheived</div>
-                  <div>{profileData.stats[gameType].peak100WmaDate}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Best Average Word Score</div>
-                  <div>{profileData.leaderboards.avgScore[gameType][0].score}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Best Word Found</div>
-                  <div>"{profileData.leaderboards.bstWord[gameType][0].word}"</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Best Word Score</div>
-                  <div>{profileData.leaderboards.bstWord[gameType][0].score}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Longest Word</div>
-                  <div>"{profileData.leaderboards.lngWord[gameType][0].word}"</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Craziest Word</div>
-                  <div>"{profileData.leaderboards.crzWord[gameType][0].word}"</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div># of Games Played</div>
-                  <div>{profileData.stats[gameType].numOfPlays}</div>
-                </div>
-                <div className="Profile-stat-display">
-                  <div>Last Played On</div>
-                  <div>{profileData.stats[gameType].lastPlay}</div>
-                </div>
+                {profileData.stats[gameType] && 
+                  <>
+                    <div>Stats:</div>
+                    <div>
+                      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <Select
+                          value={gameType}
+                          onChange={handleChange}
+                        >
+                          {gameTypeChoices.current.map((gameType) => {
+                            return <MenuItem value={gameType} key={gameType}>{gameTypeKey[gameType]}</MenuItem>
+                          })}
+                        </Select>
+                      </FormControl>
+                    </div>
+                  </>
+                }
+                {profileData.leaderboards.ttlScore[gameType][0] && 
+                  <div className="Profile-stat-display">
+                    <div>High Score</div>
+                    <div>{profileData.leaderboards.ttlScore[gameType][0].score}</div>
+                  </div>
+                }
+                {profileData.stats[gameType]?.curr20Wma &&
+                  <>
+                    <div className="Profile-stat-display">
+                      <div>Current 20-Day WMA</div>
+                      <div>{profileData.stats[gameType].curr20Wma}</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Peak 20-Day WMA</div>
+                      <div>{profileData.stats[gameType].peak20Wma}</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Date Acheived</div>
+                      <div>{profileData.stats[gameType].peak20WmaDate}</div>
+                    </div>
+                  </>
+                }
+                {profileData.stats[gameType]?.curr100Wma &&
+                  <>
+                    <div className="Profile-stat-display">
+                      <div>Current 100-Day WMA</div>
+                      <div>{profileData.stats[gameType].curr100Wma}</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Peak 100-Day WMA</div>
+                      <div>{profileData.stats[gameType].peak100Wma}</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Date Acheived</div>
+                      <div>{profileData.stats[gameType].peak100WmaDate}</div>
+                    </div>
+                  </>
+                }
+                {profileData.stats[gameType] &&
+                  <>
+                    <div className="Profile-stat-display">
+                      <div>Best Average Word Score</div>
+                      <div>{profileData.leaderboards.avgScore[gameType][0].score}</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Best Word Found</div>
+                      <div>"{profileData.leaderboards.bstWord[gameType][0].word}"</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Best Word Score</div>
+                      <div>{profileData.leaderboards.bstWord[gameType][0].score}</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Longest Word</div>
+                      <div>"{profileData.leaderboards.lngWord[gameType][0].word}"</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Craziest Word</div>
+                      <div>"{profileData.leaderboards.crzWord[gameType][0].word}"</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div># of Games Played</div>
+                      <div>{profileData.stats[gameType].numOfPlays}</div>
+                    </div>
+                    <div className="Profile-stat-display">
+                      <div>Last Played On</div>
+                      <div>{profileData.stats[gameType].lastPlay}</div>
+                    </div>
+                  </>
+                }
               </div>
             </>
           }
         </div>
       </div>
-      {profileData && 
+      {(profileData?.leaderboards.ttlScore.solo3[0] || profileData?.leaderboards.ttlScore.solo10[0] || profileData?.leaderboards.ttlScore.free[0]) &&
         <div className="Profile-card-wrapper">
           <div className="Profile-card rounded-paper">
             <div className="Profile-personal-leaderboards">
               <h3 className="Profile-personal-leaderboards-header">Personal Leaderboards:</h3>
               {profileData.leaderboards && leaderboardOrder.reduce((accum, leaderboardTitle) => {
-                if (profileData.leaderboards[leaderboardTitle]?.solo3.length || profileData.leaderboards[leaderboardTitle]?.solo10.length || profileData.leaderboards[leaderboardTitle]?.free.length) {
+                if (profileData.leaderboards[leaderboardTitle]?.solo3[0] || profileData.leaderboards[leaderboardTitle]?.solo10[0] || profileData.leaderboards[leaderboardTitle]?.free[0]) {
                   accum.push(
                     <LeaderboardTable
                       title={leaderboardTitle}
