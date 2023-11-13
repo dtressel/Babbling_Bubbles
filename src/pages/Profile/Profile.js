@@ -138,10 +138,13 @@ const Profile = () => {
                 }
                 {profileData.stats[gameType] &&
                   <>
-                    <div className="Profile-stat-display">
-                      <div>Best Average Word Score</div>
-                      <div>{profileData.leaderboards.avgScore[gameType][0].score}</div>
-                    </div>
+                    {/* Even with games played, there may not be an average word score because of 15-word threshold */}
+                    {profileData.leaderboards.avgScore[gameType][0] && 
+                      <div className="Profile-stat-display">
+                        <div>Best Average Word Score</div>
+                        <div>{profileData.leaderboards.avgScore[gameType][0].score}</div>
+                      </div>
+                    }
                     <div className="Profile-stat-display">
                       <div>Best Word Found</div>
                       <div>"{profileData.leaderboards.bstWord[gameType][0].word}"</div>
