@@ -51,18 +51,20 @@ const LeaderboardTable = ({ title, data }) => {
 
   return (
     <div>
-      <h3>{tableAndColumnTitleKey[title]}</h3>
-      <div>
-        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-          <Select
-            value={gameType}
-            onChange={handleChange}
-          >
-            {data.solo3?.length && <MenuItem value='solo3'>3-minute</MenuItem>}
-            {data.solo10?.length && <MenuItem value='solo10'>10-minute</MenuItem>}
-            {data.free?.length && <MenuItem value='free'>Free play</MenuItem>}
-          </Select>
-        </FormControl>
+      <div class="LeaderboardTable-header">
+        <h3>{tableAndColumnTitleKey[title]}</h3>
+        <div>
+          <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <Select
+              value={gameType}
+              onChange={handleChange}
+            >
+              {data.solo3?.length && <MenuItem value='solo3'>3-minute</MenuItem>}
+              {data.solo10?.length && <MenuItem value='solo10'>10-minute</MenuItem>}
+              {data.free?.length && <MenuItem value='free'>Free play</MenuItem>}
+            </Select>
+          </FormControl>
+        </div>
       </div>
       <TableContainer component={Paper} className="Leaderboards-table-container">
         <Table size="small" aria-label="a dense table">
