@@ -83,7 +83,7 @@ const Profile = () => {
               <div className="Profile-stats Profile-section">
                 {profileData.stats[gameType] && 
                   <>
-                    <div>Stats:</div>
+                    <div><b>Stats:</b></div>
                     <div>
                       <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <Select
